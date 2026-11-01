@@ -91,7 +91,31 @@ function rarete_to_int($rarete) {
 	return $int_rarete;
 }
 
-$content = file_get_contents('setdata.14.json');
+// Récupérer le numéro de chapitre depuis l'URL
+$chapter = isset($_GET['chapter']) ? $_GET['chapter'] : 14;
+
+// Construire le nom du fichier JSON
+$filename = 'setdata.' . $chapter . '.json';
+
+// Vérifier si le fichier existe
+if (!file_exists($filename)) {
+    // Essayer de télécharger depuis le site distant
+    $url = 'https://lorcanajson.org/files/current/fr/sets/setdata.' . $chapter . '.json';
+    
+    // Télécharger le contenu
+    $content = @file_get_contents($url);
+    
+    if ($content !== false) {
+        // Sauvegarder le fichier localement
+        file_put_contents($filename, $content);
+    } else {
+        die("Erreur: Impossible de récupérer le fichier $filename depuis $url");
+    }
+} else {
+    // Le fichier existe déjà localement
+    $content = file_get_contents($filename);
+}
+
 $json = json_decode($content, true);
 
 
@@ -101,7 +125,7 @@ foreach($json['cards'] as $carte) {
 	
 	if ($rarity != "Spécial" && !isset($carte['promoGrouping'])) {
 	
-		$chapitre	= 14;
+		$chapitre	= $chapter;
 		$num 		= $carte['number'];
 		$artist		= addslashes($carte['artistsText']);
 		
