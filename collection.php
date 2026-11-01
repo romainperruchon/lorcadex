@@ -453,6 +453,79 @@ if (isset($_SESSION["id_user"]) && isset($_GET['collection'])) {
 <script src="//maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/ekko-lightbox/5.3.0/ekko-lightbox.min.js" crossorigin="anonymous"></script>
 <script type="text/javascript">
+	// Fonction pour supprimer une carte normale
+	function remove_card(id_card, remove_card) {
+		$.ajax({
+			type: 'post',
+			url: 'delete.php',
+			data: {
+			  id_card:id_card,
+			  remove_card:remove_card
+			},
+			success: function (response) {
+				document.getElementById('add_card_'+id_card).value = +document.getElementById('add_card_'+id_card).value - 1;
+				
+				value_nb_foil = +document.getElementById('add_card_foil_'+id_card).value;
+				value_nb_nfoil = +document.getElementById('add_card_'+id_card).value;
+				
+				if (value_nb_foil > 0) {
+					var element = document.getElementById('img_card_'+id_card);
+					element.classList.remove("img_card-green");
+					element.classList.add("img_card-gold");
+				}
+				
+				if (value_nb_foil + value_nb_nfoil >= 4) {
+					var element = document.getElementById('img_background_'+id_card);
+					
+					if (value_nb_foil >= 1 && value_nb_nfoil >= 1 && value_nb_nfoil + value_nb_foil >= 6) {
+						element.classList.remove("img_background-green");
+						element.classList.add("img_background-gold");
+					}
+					else {
+						element.classList.add("img_background-green");
+					}
+				}
+			}
+		});
+		return false;
+	}
+	
+	// Fonction pour supprimer une carte foil
+	function remove_card_foil(id_card, remove_card_foil) {
+		$.ajax({
+			type: 'post',
+			url: 'delete.php',
+			data: {
+			  id_card:id_card,
+			  remove_card_foil:remove_card_foil
+			},
+			success: function (response) {
+				document.getElementById('add_card_foil_'+id_card).value = +document.getElementById('add_card_foil_'+id_card).value - 1;
+				
+				value_nb_foil = +document.getElementById('add_card_foil_'+id_card).value;
+				value_nb_nfoil = +document.getElementById('add_card_'+id_card).value;
+				
+				if (value_nb_nfoil > 0) {
+					var element = document.getElementById('img_card_'+id_card);
+					element.classList.remove("img_card-green");
+					element.classList.add("img_card-gold");
+				}
+				
+				if (value_nb_foil + value_nb_nfoil >= 4) {
+					var element = document.getElementById('img_background_'+id_card);
+					
+					if (value_nb_foil >= 1 && value_nb_nfoil >= 1 && value_nb_nfoil + value_nb_foil >= 6) {
+						element.classList.remove("img_background-green");
+						element.classList.add("img_background-gold");
+					}
+					else {
+						element.classList.add("img_background-green");
+					}
+				}
+			}
+		});
+		return false;
+	}
 	function sendData(id_card, add_card) {
 		
 		$.ajax({
@@ -734,6 +807,47 @@ if (isset($_SESSION["id_user"]) && isset($_GET['collection'])) {
 		
 		document.getElementById('encre4_disable').style.display = 'none';
 		document.getElementById('encre4').style.display = '';
+		
+		// Gestion des clics sur les boutons d'ajout/suppression
+		$('.btn-group').on('click', 'input[type="submit"]', function(e) {
+			// Vérifier si Shift est enfoncé
+			if (e.shiftKey) {
+				var id_card = $(this).attr('id').split('_')[3];
+				var current_value = parseInt($(this).val());
+				
+				// Si on a une valeur > 0, on supprime une carte
+				if (current_value > 0) {
+					if ($(this).attr('name').includes('add_card_foil')) {
+						// Suppression de carte foil
+						remove_card_foil(id_card, current_value);
+					} else {
+						// Suppression de carte normale
+						remove_card(id_card, current_value);
+					}
+				}
+				e.preventDefault();
+			}
+		});
+		
+		// Gestion du clic droit (contextmenu) pour suppression
+		$('.btn-group').on('contextmenu', 'input[type="submit"]', function(e) {
+			e.preventDefault();
+			var id_card = $(this).attr('id').split('_')[3];
+			var current_value = parseInt($(this).val());
+			
+			// Si on a une valeur > 0, on supprime une carte
+			if (current_value > 0) {
+				if ($(this).attr('name').includes('add_card_foil')) {
+					// Suppression de carte foil
+					remove_card_foil(id_card, current_value);
+				} else {
+					// Suppression de carte normale
+					remove_card(id_card, current_value);
+				}
+			}
+		});
+		
+	});
 	}
 	
 	// SAPHIR
