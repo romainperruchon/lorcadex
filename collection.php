@@ -183,7 +183,7 @@ if (isset($_SESSION["id_user"]) && isset($_GET['collection'])) {
 		padding-left: 32px;
 	  }
 	  
-	  @media (min-width:400px) {
+	  @media (min-width: 400px) {
 	  .numcard {
 		padding-bottom: 16px; 
 		padding-left: 38px;
@@ -335,6 +335,7 @@ if (isset($_SESSION["id_user"]) && isset($_GET['collection'])) {
 			$cat_carte	= $t_cartes["categorie_carte"];
 			$rarete		= $t_cartes["rarete"];
 			$encre		= $t_cartes["encre"];
+			$image_url	= $t_cartes["image"];
 			
 			// Nombre non foil
 			$sql_nb_nf = "SELECT quantite FROM user_as_carte WHERE id_user='$id_user' AND id_carte='$id_carte' AND foil='0'";
@@ -394,8 +395,18 @@ if (isset($_SESSION["id_user"]) && isset($_GET['collection'])) {
 					<?php echo "<div style ='border:1px solid black; background-color: lightblue;'>".$num_carte."</div>"; ?>
 				</div>
 				<?php 
-				echo "<a href='cartes/FR/".$nom_chapitre."/".$num_carte.".jpg' class='image_carte' data-toggle=\"lightbox\" data-gallery=\"chapitre1\" />";
-				echo "	<img src='cartes/FR/".$nom_chapitre."/".$num_carte.".jpg' width='100%' height='100%' id='img_card_".$id_carte."' class='img-fluid img-thumbnail"; 
+				// Construct local image path
+				$local_image_path = 'cartes/FR/'.$nom_chapitre.'/'.$num_carte.'.jpg';
+				
+				// Check if the local image exists, otherwise use the URL from database
+				if (file_exists($local_image_path)) {
+					$image_src = $local_image_path;
+				} else {
+					$image_src = $image_url;
+				}
+				echo "<a href='".$local_image_path."' class='image_carte' data-toggle=\"lightbox\" data-gallery=\"chapitre1\" />";
+				echo "\t<img src='".$image_src."' width='100%' height='100%' id='img_card_".$id_carte."' class='img-fluid img-thumbnail";
+
 				if ($nb_nf > 0 || $nb_f > 0) {
 					if ($nb_nf > 0 && $nb_f > 0) {
 						echo " img_card-gold";
@@ -615,6 +626,46 @@ if (isset($_SESSION["id_user"]) && isset($_GET['collection'])) {
 			
 		return false;
 	}
+
+	// Gestion des clics sur les boutons d'ajout/suppression
+	$('.btn-group').on('click', 'input[type="submit"]', function(e) {
+		// Vérifier si Shift est enfoncé
+		if (e.shiftKey) {
+			var id_card = $(this).attr('id').split('_')[3];
+			var current_value = parseInt($(this).val());
+			
+			// Si on a une valeur > 0, on supprime une carte
+			if (current_value > 0) {
+				if ($(this).attr('name').includes('add_card_foil')) {
+					// Suppression de carte foil
+					remove_card_foil(id_card, current_value);
+				} else {
+					// Suppression de carte normale
+					remove_card(id_card, current_value);
+				}
+			}
+			e.preventDefault();
+		}
+	});
+	
+	// Gestion du clic droit (contextmenu) pour suppression
+	$('.btn-group').on('contextmenu', 'input[type="submit"]', function(e) {
+		e.preventDefault();
+		var id_card = $(this).attr('id').split('_')[3];
+		var current_value = parseInt($(this).val());
+		
+		// Si on a une valeur > 0, on supprime une carte
+		if (current_value > 0) {
+			// Vérifier si c'est une carte foil en examinant l'ID
+			if ($(this).attr('id').includes('add_card_foil_')) {
+				// Suppression de carte foil
+				remove_card_foil(id_card, current_value);
+			} else {
+				// Suppression de carte normale
+				remove_card(id_card, current_value);
+			}
+		}
+	});
 	
 	function afficher_min() {
 		document.querySelectorAll('.image_carte').forEach(function(el) {
@@ -822,49 +873,8 @@ if (isset($_SESSION["id_user"]) && isset($_GET['collection'])) {
 		
 		document.getElementById('encre4_disable').style.display = 'none';
 		document.getElementById('encre4').style.display = '';
-		
-		// Gestion des clics sur les boutons d'ajout/suppression
-		$('.btn-group').on('click', 'input[type="submit"]', function(e) {
-			// Vérifier si Shift est enfoncé
-			if (e.shiftKey) {
-				var id_card = $(this).attr('id').split('_')[3];
-				var current_value = parseInt($(this).val());
-				
-				// Si on a une valeur > 0, on supprime une carte
-				if (current_value > 0) {
-					if ($(this).attr('name').includes('add_card_foil')) {
-						// Suppression de carte foil
-						remove_card_foil(id_card, current_value);
-					} else {
-						// Suppression de carte normale
-						remove_card(id_card, current_value);
-					}
-				}
-				e.preventDefault();
-			}
-		});
-		
-		// Gestion du clic droit (contextmenu) pour suppression
-		$('.btn-group').on('contextmenu', 'input[type="submit"]', function(e) {
-			e.preventDefault();
-			var id_card = $(this).attr('id').split('_')[3];
-			var current_value = parseInt($(this).val());
-			
-			// Si on a une valeur > 0, on supprime une carte
-			if (current_value > 0) {
-				if ($(this).attr('name').includes('add_card_foil')) {
-					// Suppression de carte foil
-					remove_card_foil(id_card, current_value);
-				} else {
-					// Suppression de carte normale
-					remove_card(id_card, current_value);
-				}
-			}
-		});
-		
-	});
 	}
-	
+
 	// SAPHIR
 	function effacer_saphirs() {
 		document.querySelectorAll('.saphir').forEach(function(el) {
