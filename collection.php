@@ -232,6 +232,21 @@ if (isset($_SESSION["id_user"]) && isset($_GET['collection'])) {
 	  .main-content {
 		padding-top: 150px; /* Adjust based on header height */
 	  }
+	  
+	  /* Fixed footer styles */
+	  .footer {
+		position: fixed;
+		bottom: 0;
+		width: 100%;
+		z-index: 1000;
+		background-color: #f8f9fa;
+		box-shadow: 0 -2px 4px rgba(0,0,0,.1);
+	  }
+	  
+	  /* Add padding to main content to prevent overlap with footer */
+	  .main-content {
+		padding-bottom: 100px; /* Adjust based on footer height */
+	  }
     </style>
 
     
