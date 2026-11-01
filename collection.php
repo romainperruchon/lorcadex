@@ -212,13 +212,28 @@ if (isset($_SESSION["id_user"]) && isset($_GET['collection'])) {
 		padding-bottom: 24px; 
 		padding-left: 62px;
 	  }
+	  
+	  /* Sticky header styles */
+	  .sticky-header {
+		position: fixed;
+		top: 0;
+		width: 100%;
+		z-index: 1000;
+		background-color: #343a40; /* Match the navbar background */
+		box-shadow: 0 2px 4px rgba(0,0,0,.1);
+	  }
+	  
+	  /* Add padding to main content to prevent overlap */
+	  .main-content {
+		padding-top: 150px; /* Adjust based on header height */
+	  }
     </style>
 
     
   </head>
   <body>
   
-<header data-bs-theme="dark">
+<header data-bs-theme="dark" class="sticky-header">
   <div class="navbar-dark bg-dark shadow-sm">
     <div class="container d-flex align-items-center">
       <a href="liste_collection.php"><img src="./img/logo.png" alt="" width="52" height="72"></a>
@@ -227,7 +242,7 @@ if (isset($_SESSION["id_user"]) && isset($_GET['collection'])) {
   </div>
 </header>
 
-<main>
+<main class="main-content">
 
   <section class="py-1 text-center container">
     <div class="row">
@@ -431,7 +446,7 @@ if (isset($_SESSION["id_user"]) && isset($_GET['collection'])) {
   
   
   
-  <footer class="d-flex flex-wrap justify-content-between align-items-center py-1 my-1 fixed-bottom">
+  <footer class="d-flex flex-wrap justify-content-between align-items-center py-1 my-1">
 	<div class="col-3"></div>
 	<div class="col-6">
 		<form method='post' action='collection.php?collection=<?php echo $choix_collection; ?>'>
