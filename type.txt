@@ -1,0 +1,12 @@
+type carte :
+1 - Personnage
+2 - Action
+3 - Objet
+4 - Chanson
+
+Encre :
+1 - Ambre 
+2 - Améthyste
+3 -
+4 -
+5 -
