@@ -228,9 +228,20 @@ if (isset($_SESSION["id_user"]) && isset($_GET['collection'])) {
 		box-shadow: 0 2px 4px rgba(0,0,0,.1);
 	  }
 	  
+	  /* Sticky filter section styles */
+	  .sticky-filters {
+		position: fixed;
+		top: 70px;
+		width: 100%;
+		z-index: 999;
+		background-color: white;
+		padding: 1rem 0;
+		box-shadow: 0 2px 4px rgba(0,0,0,.1);
+	  }
+	  
 	  /* Add padding to main content to prevent overlap */
 	  .main-content {
-		padding-top: 150px; /* Adjust based on header height */
+		padding-top: 125px;
 	  }
 	  
 	  /* Fixed footer styles */
@@ -264,7 +275,7 @@ if (isset($_SESSION["id_user"]) && isset($_GET['collection'])) {
 
 <main class="main-content">
 
-  <section class="py-1 text-center container">
+  <section class="py-1 text-center sticky-filters">
     <div class="row">
 	  <div class="col-6">
 		<img title='ambres' onclick="effacer_ambres()" id="encre1" src='img/encre1.png' class="img-fluid" />
