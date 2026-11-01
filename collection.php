@@ -315,7 +315,7 @@ if (isset($_SESSION["id_user"]) && isset($_GET['collection'])) {
 			$sql .= " AND id_carte NOT IN (SELECT DISTINCT(id_carte) FROM user_as_carte WHERE id_user='$id_user' AND quantite > 0)";
 		}
 		else if ($choix_affichage == 3) {
-			$sql .= " AND id_carte NOT IN (SELECT DISTINCT(id_carte) FROM user_as_carte WHERE id_user='$id_user' AND quantite > 0 AND foil='0')";
+			$sql .= " AND id_carte NOT IN (SELECT DISTINCT(id_carte) FROM user_as_carte WHERE id_user='$id_user' AND (quantite > 0 OR (quantite = 0 AND foil='0')))";
 		}
 		else if ($choix_affichage == 4) {
 			$sql .= " AND id_carte NOT IN (SELECT DISTINCT(id_carte) FROM user_as_carte WHERE id_user='$id_user' AND quantite > 0 AND foil='1' AND rarete != 6 AND rarete != 7 AND rarete != 8)";
