@@ -184,33 +184,38 @@ if (isset($_SESSION["id_user"]) && isset($_GET['collection'])) {
 	  }
 	  
 	  @media (min-width: 400px) {
-	  .numcard {
-		padding-bottom: 16px; 
-		padding-left: 38px;
+		.numcard {
+			padding-bottom: 16px; 
+			padding-left: 38px;
+		}
 	  }
 	  
 	  @media (min-width:600px) {
-	  .numcard {
-		padding-bottom: 14px; 
-		padding-left: 32px;
+		.numcard {
+			padding-bottom: 14px; 
+			padding-left: 32px;
+		}
 	  }
 	  
 	  @media (min-width:1000px) {
-	  .numcard {
-		padding-bottom: 18px; 
-		padding-left: 42px;
+		.numcard {
+			padding-bottom: 18px; 
+			padding-left: 42px;
+		}
 	  }
 	  
 	  @media (min-width:1200px) {
-	  .numcard {
-		padding-bottom: 21px; 
-		padding-left: 52px;
+		.numcard {
+			padding-bottom: 21px; 
+			padding-left: 52px;
+		}
 	  }
 	  
 	  @media (min-width:1600px) {
-	  .numcard {
-		padding-bottom: 24px; 
-		padding-left: 62px;
+		.numcard {
+			padding-bottom: 24px; 
+			padding-left: 62px;
+		}
 	  }
 	  
 	  /* Sticky header styles */
@@ -457,20 +462,24 @@ if (isset($_SESSION["id_user"]) && isset($_GET['collection'])) {
   
   
   
-  <footer class="d-flex flex-wrap justify-content-between align-items-center py-1 my-1">
-	<div class="col-3"></div>
-	<div class="col-6">
-		<form method='post' action='collection.php?collection=<?php echo $choix_collection; ?>'>
-			<select class="form-select form-select-sm" name='choix_affichage' onchange="this.form.submit()">
-				<option value='1' <?php if ($choix_affichage == 1) { echo "selected"; } ?>>Toutes les cartes</option>
-				<option value='2' <?php if ($choix_affichage == 2) { echo "selected"; } ?>>Toutes les manquantes</option>
-				<option value='3' <?php if ($choix_affichage == 3) { echo "selected"; } ?>>Manquantes normales</option>
-				<option value='4' <?php if ($choix_affichage == 4) { echo "selected"; } ?>>Manquantes foils</option>
-				<option value='5' <?php if ($choix_affichage == 5) { echo "selected"; } ?>>Ma collection</option>
-			</select>
-		</form>
-	</div>
-	<div class="col-3"></div>
+  <footer class="footer mt-auto py-3 bg-light">
+    <div class="container">
+      <div class="row">
+        <div class="col-md-3"></div>
+        <div class="col-md-6">
+          <form method='post' action='collection.php?collection=<?php echo $choix_collection; ?>'>
+            <select class="form-select form-select-sm" name='choix_affichage' onchange="this.form.submit()">
+              <option value='1' <?php if ($choix_affichage == 1) { echo "selected"; } ?>>Toutes les cartes</option>
+              <option value='2' <?php if ($choix_affichage == 2) { echo "selected"; } ?>>Toutes les manquantes</option>
+              <option value='3' <?php if ($choix_affichage == 3) { echo "selected"; } ?>>Manquantes normales</option>
+              <option value='4' <?php if ($choix_affichage == 4) { echo "selected"; } ?>>Manquantes foils</option>
+              <option value='5' <?php if ($choix_affichage == 5) { echo "selected"; } ?>>Ma collection</option>
+            </select>
+          </form>
+        </div>
+        <div class="col-md-3"></div>
+      </div>
+    </div>
   </footer>
 
 </main>
