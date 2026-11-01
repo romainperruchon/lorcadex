@@ -119,6 +119,10 @@ if (!file_exists($filename)) {
 $json = json_decode($content, true);
 
 
+// Supprimer les cartes existantes pour ce chapitre avant l'insertion
+$delete_sql = "DELETE FROM cartes WHERE chapitre = $chapter";
+$mysqli->query($delete_sql);
+
 foreach($json['cards'] as $carte) {
 	
 	$rarity = $carte['rarity'];
