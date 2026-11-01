@@ -489,26 +489,50 @@ if (isset($_SESSION["id_user"]) && isset($_GET['collection'])) {
 			  remove_card:remove_card
 			},
 			success: function (response) {
-				document.getElementById('add_card_'+id_card).value = +document.getElementById('add_card_'+id_card).value - 1;
 				
-				value_nb_foil = +document.getElementById('add_card_foil_'+id_card).value;
-				value_nb_nfoil = +document.getElementById('add_card_'+id_card).value;
+				// Vérifier si l'élément existe avant de le modifier
+				var element = document.getElementById('add_card_'+id_card);
+				element.value = +element.value - 1;
 				
-				if (value_nb_foil > 0) {
-					var element = document.getElementById('img_card_'+id_card);
-					element.classList.remove("img_card-green");
-					element.classList.add("img_card-gold");
+				// Mise à jour des classes CSS
+				var element_foil = document.getElementById('add_card_foil_'+id_card);
+				var element_nfoil = document.getElementById('add_card_'+id_card);
+				
+				if (element_foil) {
+					var value_nb_foil = +element_foil.value;
+					if (value_nb_foil > 0) {
+						var imgElement = document.getElementById('img_card_'+id_card);
+						if (imgElement) {
+							imgElement.classList.remove("img_card-green");
+							imgElement.classList.add("img_card-gold");
+						}
+					}
 				}
 				
-				if (value_nb_foil + value_nb_nfoil >= 4) {
-					var element = document.getElementById('img_background_'+id_card);
-					
-					if (value_nb_foil >= 1 && value_nb_nfoil >= 1 && value_nb_nfoil + value_nb_foil >= 6) {
-						element.classList.remove("img_background-green");
-						element.classList.add("img_background-gold");
-					}
-					else {
-						element.classList.add("img_background-green");
+				if (element_nfoil) {
+					var value_nb_nfoil = +element_nfoil.value;
+					if (element_foil) {
+						var value_nb_foil = +element_foil.value;
+						if (value_nb_foil + value_nb_nfoil >= 4) {
+							var bgElement = document.getElementById('img_background_'+id_card);
+							if (bgElement) {
+								if (value_nb_foil >= 1 && value_nb_nfoil >= 1 && value_nb_nfoil + value_nb_foil >= 6) {
+									bgElement.classList.remove("img_background-green");
+									bgElement.classList.add("img_background-gold");
+								}
+								else {
+									bgElement.classList.add("img_background-green");
+								}
+							}
+						}
+					} else {
+						// Si pas de foil, vérifier juste les cartes normales
+						if (value_nb_nfoil >= 4) {
+							var bgElement = document.getElementById('img_background_'+id_card);
+							if (bgElement) {
+								bgElement.classList.add("img_background-green");
+							}
+						}
 					}
 				}
 			}
@@ -526,26 +550,51 @@ if (isset($_SESSION["id_user"]) && isset($_GET['collection'])) {
 			  remove_card_foil:remove_card_foil
 			},
 			success: function (response) {
-				document.getElementById('add_card_foil_'+id_card).value = +document.getElementById('add_card_foil_'+id_card).value - 1;
-				
-				value_nb_foil = +document.getElementById('add_card_foil_'+id_card).value;
-				value_nb_nfoil = +document.getElementById('add_card_'+id_card).value;
-				
-				if (value_nb_nfoil > 0) {
-					var element = document.getElementById('img_card_'+id_card);
-					element.classList.remove("img_card-green");
-					element.classList.add("img_card-gold");
+				// Vérifier si l'élément existe avant de le modifier
+				var element = document.getElementById('add_card_foil_'+id_card);
+				if (element) {
+					element.value = +element.value - 1;
 				}
 				
-				if (value_nb_foil + value_nb_nfoil >= 4) {
-					var element = document.getElementById('img_background_'+id_card);
-					
-					if (value_nb_foil >= 1 && value_nb_nfoil >= 1 && value_nb_nfoil + value_nb_foil >= 6) {
-						element.classList.remove("img_background-green");
-						element.classList.add("img_background-gold");
+				// Mise à jour des classes CSS
+				var element_foil = document.getElementById('add_card_foil_'+id_card);
+				var element_nfoil = document.getElementById('add_card_'+id_card);
+				
+				if (element_nfoil) {
+					var value_nb_nfoil = +element_nfoil.value;
+					if (value_nb_nfoil > 0) {
+						var imgElement = document.getElementById('img_card_'+id_card);
+						if (imgElement) {
+							imgElement.classList.remove("img_card-green");
+							imgElement.classList.add("img_card-gold");
+						}
 					}
-					else {
-						element.classList.add("img_background-green");
+				}
+				
+				if (element_foil) {
+					var value_nb_foil = +element_foil.value;
+					if (element_nfoil) {
+						var value_nb_nfoil = +element_nfoil.value;
+						if (value_nb_foil + value_nb_nfoil >= 4) {
+							var bgElement = document.getElementById('img_background_'+id_card);
+							if (bgElement) {
+								if (value_nb_foil >= 1 && value_nb_nfoil >= 1 && value_nb_nfoil + value_nb_foil >= 6) {
+									bgElement.classList.remove("img_background-green");
+									bgElement.classList.add("img_background-gold");
+								}
+								else {
+									bgElement.classList.add("img_background-green");
+								}
+							}
+						}
+					} else {
+						// Si pas de nfoil, vérifier juste les cartes foil
+						if (value_nb_foil >= 4) {
+							var bgElement = document.getElementById('img_background_'+id_card);
+							if (bgElement) {
+								bgElement.classList.add("img_background-green");
+							}
+						}
 					}
 				}
 			}
@@ -631,12 +680,23 @@ if (isset($_SESSION["id_user"]) && isset($_GET['collection'])) {
 	$('.btn-group').on('click', 'input[type="submit"]', function(e) {
 		// Vérifier si Shift est enfoncé
 		if (e.shiftKey) {
-			var id_card = $(this).attr('id').split('_')[3];
+			var elementId = $(this).attr('id');
+			var id_card;
+			
+			// Extraction de l'ID de la carte de manière robuste
+			if (elementId.includes('add_card_foil_')) {
+				// Pour les cartes foil : id="add_card_foil_123"
+				id_card = elementId.split('add_card_foil_')[1];
+			} else if (elementId.includes('add_card_')) {
+				// Pour les cartes normales : id="add_card_123"  
+				id_card = elementId.split('add_card_')[1];
+			}
+			
 			var current_value = parseInt($(this).val());
 			
 			// Si on a une valeur > 0, on supprime une carte
-			if (current_value > 0) {
-				if ($(this).attr('name').includes('add_card_foil')) {
+			if (current_value > 0 && id_card) {
+				if (elementId.includes('add_card_foil_')) {
 					// Suppression de carte foil
 					remove_card_foil(id_card, current_value);
 				} else {
@@ -651,13 +711,23 @@ if (isset($_SESSION["id_user"]) && isset($_GET['collection'])) {
 	// Gestion du clic droit (contextmenu) pour suppression
 	$('.btn-group').on('contextmenu', 'input[type="submit"]', function(e) {
 		e.preventDefault();
-		var id_card = $(this).attr('id').split('_')[3];
+		var elementId = $(this).attr('id');
+		var id_card;
+		
+		// Extraction de l'ID de la carte de manière robuste
+		if (elementId.includes('add_card_foil_')) {
+			// Pour les cartes foil : id="add_card_foil_123"
+			id_card = elementId.split('add_card_foil_')[1];
+		} else if (elementId.includes('add_card_')) {
+			// Pour les cartes normales : id="add_card_123"  
+			id_card = elementId.split('add_card_')[1];
+		}
+		
 		var current_value = parseInt($(this).val());
 		
 		// Si on a une valeur > 0, on supprime une carte
-		if (current_value > 0) {
-			// Vérifier si c'est une carte foil en examinant l'ID
-			if ($(this).attr('id').includes('add_card_foil_')) {
+		if (current_value > 0 && id_card) {
+			if (elementId.includes('add_card_foil_')) {
 				// Suppression de carte foil
 				remove_card_foil(id_card, current_value);
 			} else {
