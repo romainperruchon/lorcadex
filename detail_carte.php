@@ -97,21 +97,48 @@ if (isset($_SESSION["id_user"])) {
 	
 ?>
 <!doctype html>
-<html lang="en" data-bs-theme="auto">
+<html lang="fr" data-bs-theme="auto">
   <head>
-	<script src="./assets/js/color-modes.js"></script>
-
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="description" content="">
+    <meta name="description" content="Détail de la carte">
     <meta name="author" content="Romain PERRUCHON">
-    <title>Lorcadex</title>
+    <title>Lorcadex - Détail de la carte</title>
 
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@docsearch/css@3">
-	
-	<link href="./assets/dist/css/bootstrap.min.css" rel="stylesheet">
-	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/ekko-lightbox/5.3.0/ekko-lightbox.css">
+    <link href="./assets/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/ekko-lightbox/5.3.0/ekko-lightbox.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
 
+    <style>
+        .card-image {
+            max-height: 400px;
+            object-fit: contain;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+        .rarete-badge {
+            font-size: 0.9rem;
+            padding: 0.25rem 0.5rem;
+            border-radius: 50px;
+        }
+        .encre-icon {
+            width: 24px;
+            height: 24px;
+        }
+        .quantity-control {
+            min-width: 80px;
+        }
+        .card-detail-container {
+            background: linear-gradient(135deg, #f5f7fa 0%, #e4edf5 100%);
+            border-radius: 15px;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+        }
+        .stats-card {
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+        }
+    </style>
   </head>
   <body>
   
@@ -119,58 +146,149 @@ if (isset($_SESSION["id_user"])) {
   <div class="navbar-dark bg-dark shadow-sm">
     <div class="container">
       <a href="collection.php<?php echo "?collection=$chapitre"; ?>" class="navbar-brand d-flex align-items-center">
-        <img src="./img/logo.png" alt="" width="52" height="72"><strong><?php echo $nom_chapitre; ?></strong>
+        <img src="./img/logo.png" alt="" width="52" height="72"><strong>Chapitre</strong>
       </a>
     </div>
   </div>
 </header>
 
-<main>
-	<div class="container">
-		<div class='row'>
-			<div class='col-6 py-3 px-3'>
-				<?php echo "<img src='cartes/FR/Chapitre ".$chapitre."/".$num_carte.".jpg' width='100%' height='100%' class='img-fluid' />"; ?>
-			</div>
-			<div class='col-6 py-3 px-3'>
-				<?php
-				
-				echo "<table>";
-				echo "	<tr>";
-				echo "		<td><b>".$nom_carte_princ."</b>&nbsp;<img src='img/encre".$encre.".png' width='20' height='20' title='encre' class='img-fluid' />&nbsp;<img src='img/rarete_".$rarete.".png' width='20' height='20' class='img-fluid' title='rareté' /></td>";
-				echo "	</tr>";
-				echo "	<tr>";
-				echo "		<td><i>".$nom_carte_sec."</i></td>";
-				echo "	</tr>";
-				echo "	</tr>";
-				echo "</table>";
-				
-				?>
+<main class="py-4">
+	<div class="container card-detail-container">
+		<div class="row justify-content-center mb-4">
+			<div class="col-md-10 text-center">
+				<h1 class="display-6 fw-bold text-primary"><?php echo htmlspecialchars($nom_carte_princ); ?></h1>
+				<?php if (!empty($nom_carte_sec)): ?>
+					<h2 class="display-7 fw-bold text-secondary"><?php echo htmlspecialchars($nom_carte_sec); ?></h2>
+				<?php endif; ?>
 			</div>
 		</div>
-		<?php
-		echo "<form method='post' action='detail_carte.php?id_carte=".$id_carte."'>";
-		echo "	<div class='row px-2'>";
-		echo "		<div class='col-4'><b>Normale :</b></div>";
-		echo "		<div class='col-2'><input type='submit' class='form-control' value='-' name='nb_norm_moins'></div>";
-		echo "		<div class='col-2' style='text-align:center;'>".$nb_nf."</div>";
-		echo "		<div class='col-2'><input type='submit' class='form-control' value='+' name='nb_norm_plus'></div>";
-		echo "	</div>";
-		if ($rarete != 6) {
-			echo "	<div class='row px-2'>";
-			echo "		<div class='col-4'><b>Foil :</b></div>";
-			echo "		<div class='col-2'><input type='submit' class='form-control' value='-' name='nb_foil_moins'></div>";
-			echo "		<div class='col-2' style='text-align:center;'>".$nb_f."</div>";
-			echo "		<div class='col-2'><input type='submit' class='form-control' value='+' name='nb_foil_plus'></div>";
-			echo "	</div>";
-			echo "</form>";
-		}
-		?>
+
+		<div class="row g-4">
+			<!-- Image de la carte -->
+			<div class="col-lg-6">
+				<div class="card stats-card h-100">
+					<div class="card-body text-center p-4">
+						<?php 
+						// Vérification si l'image locale existe
+						$image_path = "img/cartes/" . $num_carte . ".jpg";
+						if (file_exists($image_path)) {
+							echo '<img src="' . $image_path . '" class="card-image img-fluid" alt="Image de la carte ' . htmlspecialchars($nom_carte_princ) . '">';
+						} else {
+							// Si l'image locale n'existe pas, afficher l'image depuis l'URL
+							$image_url = $t_carte["image"];
+							if (!empty($image_url)) {
+								echo '<img src="' . htmlspecialchars($image_url) . '" class="card-image img-fluid" alt="Image de la carte ' . htmlspecialchars($nom_carte_princ) . '">';
+							} else {
+								// Si aucune image n'est disponible, afficher un placeholder
+								echo '<img src="https://via.placeholder.com/300" class="card-image img-fluid" alt="Image de la carte ' . htmlspecialchars($nom_carte_princ) . '">';
+							}
+						}
+						?>
+					</div>
+				</div>
+			</div>
+
+			<!-- Informations sur la carte -->
+			<div class="col-lg-6">
+				<div class="card stats-card h-100">
+					<div class="card-body">
+						<h3 class="card-title">Informations</h3>
+						
+						<div class="row mb-3">
+							<div class="col-4 fw-bold">Numéro:</div>
+							<div class="col-8"><?php echo htmlspecialchars($num_carte); ?></div>
+						</div>
+						
+						<div class="row mb-3">
+							<div class="col-4 fw-bold">Catégorie:</div>
+							<div class="col-8"><?php echo htmlspecialchars($cat_carte); ?></div>
+						</div>
+						
+						<div class="row mb-3">
+							<div class="col-4 fw-bold">Chapitre:</div>
+							<div class="col-8"><?php echo htmlspecialchars($nom_chapitre); ?></div>
+						</div>
+						
+						<div class="row mb-3">
+							<div class="col-4 fw-bold">Rareté:</div>
+							<div class="col-8">
+								<span class="badge rarete-badge bg-success"><?php echo htmlspecialchars($rarete); ?></span>
+							</div>
+						</div>
+						
+						<div class="row mb-3">
+							<div class="col-4 fw-bold">Encre:</div>
+							<div class="col-8">
+								<img src='img/encre<?php echo $encre; ?>.png' class='encre-icon' alt='Encre <?php echo $encre; ?>'>
+								<span class="ms-2"><?php echo htmlspecialchars($encre); ?></span>
+							</div>
+						</div>
+						
+						<div class="row mb-3">
+							<div class="col-4 fw-bold">Description:</div>
+							<div class="col-8">Description de la carte ici...</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<!-- Contrôles de quantité -->
+		<div class="row mt-4">
+			<div class="col-12">
+				<div class="card stats-card">
+					<div class="card-body">
+						<h3 class="card-title">Ma Collection</h3>
+						
+						<form method="post" action="">
+							<div class="row align-items-center g-3">
+								<div class="col-md-3">
+									<label class="form-label fw-bold">Carte Normale:</label>
+								</div>
+								<div class="col-md-2">
+									<button type="submit" name="nb_norm_moins" value="1" class="btn btn-outline-danger quantity-control">
+										<i class="bi bi-dash"></i>
+									</button>
+								</div>
+								<div class="col-md-2 text-center">
+									<span class="fw-bold fs-4"><?php echo $nb_nf; ?></span>
+								</div>
+								<div class="col-md-2">
+									<button type="submit" name="nb_norm_plus" value="1" class="btn btn-outline-success quantity-control">
+										<i class="bi bi-plus"></i>
+									</button>
+								</div>
+							</div>
+							
+							<div class="row align-items-center g-3 mt-2">
+								<div class="col-md-3">
+									<label class="form-label fw-bold">Carte Foil:</label>
+								</div>
+								<div class="col-md-2">
+									<button type="submit" name="nb_foil_moins" value="1" class="btn btn-outline-danger quantity-control">
+										<i class="bi bi-dash"></i>
+									</button>
+								</div>
+								<div class="col-md-2 text-center">
+									<span class="fw-bold fs-4"><?php echo $nb_f; ?></span>
+								</div>
+								<div class="col-md-2">
+									<button type="submit" name="nb_foil_plus" value="1" class="btn btn-outline-success quantity-control">
+										<i class="bi bi-plus"></i>
+									</button>
+								</div>
+							</div>
+						</form>
+					</div>
+				</div>
+			</div>
+		</div>
 	</div>
 </main>
 
-<script src="//ajax.googleapis.com/ajax/libs/jquery/3.0.0/jquery.min.js" integrity="sha384-THPy051/pYDQGanwU6poAc/hOdQxjnOEXzbT+OuUAFqNqFjL+4IGLBgCJC3ZOShY" crossorigin="anonymous"></script>
-<script src="//maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/ekko-lightbox/5.3.0/ekko-lightbox.min.js" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/ekko-lightbox/5.3.0/ekko-lightbox.min.js"></script>
 
   </body>
 </html>
