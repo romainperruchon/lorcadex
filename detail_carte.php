@@ -212,7 +212,24 @@ if (isset($_SESSION["id_user"])) {
 						<div class="row mb-3">
 							<div class="col-4 fw-bold">Rareté:</div>
 							<div class="col-8">
-								<span class="badge rarete-badge bg-success"><?php echo htmlspecialchars($rarete); ?></span>
+								<?php
+								// Définir les libellés de rareté et leurs images par numéro
+								$rarete_labels = [
+									1 => ["libelle" => "Commune", "image" => "rarete_1.png"],
+									2 => ["libelle" => "Unco", "image" => "rarete_2.png"],
+									3 => ["libelle" => "Rare", "image" => "rarete_3.png"],
+									4 => ["libelle" => "Très Rare", "image" => "rarete_4.png"],
+									5 => ["libelle" => "Légendaire", "image" => "rarete_5.png"],
+									6 => ["libelle" => "Enchantée", "image" => "rarete_6.png"],
+									7 => ["libelle" => "Epic", "image" => "rarete_7.png"],
+									8 => ["libelle" => "Iconique", "image" => "rarete_8.png"]
+								];
+								
+								$rarete_data = isset($rarete_labels[$rarete]) ? $rarete_labels[$rarete] : $rarete_labels[1];
+								$rarete_libelle = $rarete_data['libelle'];
+								$rarete_image = $rarete_data['image'];
+								?>
+								<span class="badge rarete-badge bg-success"><img src='img/<?php echo $rarete_image; ?>' class='encre-icon' alt='<?php echo htmlspecialchars($rarete_libelle); ?>'> <?php echo htmlspecialchars($rarete_libelle); ?></span>
 							</div>
 						</div>
 						
@@ -220,13 +237,27 @@ if (isset($_SESSION["id_user"])) {
 							<div class="col-4 fw-bold">Encre:</div>
 							<div class="col-8">
 								<img src='img/encre<?php echo $encre; ?>.png' class='encre-icon' alt='Encre <?php echo $encre; ?>'>
-								<span class="ms-2"><?php echo htmlspecialchars($encre); ?></span>
+								<span class="ms-2">
+									<?php
+									// Définir les libellés d'encre
+									$encre_labels = [
+										1 => "Ambre",
+										2 => "Améthyste", 
+										3 => "Emeraude",
+										4 => "Rubis",
+										5 => "Saphir",
+										6 => "Acier"
+									];
+									$encre_label = isset($encre_labels[$encre]) ? $encre_labels[$encre] : "Inconnue";
+									echo htmlspecialchars($encre_label);
+									?>
+								</span>
 							</div>
 						</div>
 						
 						<div class="row mb-3">
-							<div class="col-4 fw-bold">Description:</div>
-							<div class="col-8">Description de la carte ici...</div>
+							<div class="col-4 fw-bold">Artiste:</div>
+							<div class="col-8"><?php echo htmlspecialchars($t_carte["artiste"]); ?></div>
 						</div>
 					</div>
 				</div>
