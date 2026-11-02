@@ -146,7 +146,7 @@ if (isset($_SESSION["id_user"])) {
   <div class="navbar-dark bg-dark shadow-sm">
     <div class="container">
       <a href="collection.php<?php echo "?collection=$chapitre"; ?>" class="navbar-brand d-flex align-items-center">
-        <img src="./img/logo.png" alt="" width="52" height="72"><strong>Chapitre</strong>
+        <img src="./img/logo.png" alt="" width="52" height="72"><strong><?php echo htmlspecialchars($nom_chapitre); ?></strong>
       </a>
     </div>
   </div>

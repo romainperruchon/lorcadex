@@ -40,6 +40,15 @@ if (isset($_SESSION["id_user"]) && isset($_GET['collection'])) {
 	$res_r6 = $mysqli->query($sql_r6);
 	$nb_ench = $res_r6->num_rows;
 	
+	// Nouvelles raretés 7 et 8
+	$sql_r7 = "SELECT id_carte FROM cartes WHERE rarete='7' AND chapitre='$choix_collection'";
+	$res_r7 = $mysqli->query($sql_r7);
+	$nb_epic = $res_r7->num_rows;
+	
+	$sql_r8 = "SELECT id_carte FROM cartes WHERE rarete='8' AND chapitre='$choix_collection'";
+	$res_r8 = $mysqli->query($sql_r8);
+	$nb_iconique = $res_r8->num_rows;
+	
 	// Récupération du nombre de cartes par rareté de l'utilisateur 
 	$sql_r1_user = "SELECT user_as_carte.id_carte FROM user_as_carte, cartes WHERE user_as_carte.id_carte = cartes.id_carte AND user_as_carte.id_user='$id_user' AND rarete='1' AND chapitre='$choix_collection' GROUP BY user_as_carte.id_carte";
 	$res_r1_user = $mysqli->query($sql_r1_user);
@@ -64,6 +73,15 @@ if (isset($_SESSION["id_user"]) && isset($_GET['collection'])) {
 	$sql_r6_user = "SELECT user_as_carte.id_carte FROM user_as_carte, cartes WHERE user_as_carte.id_carte = cartes.id_carte AND user_as_carte.id_user='$id_user' AND rarete='6' AND chapitre='$choix_collection' GROUP BY user_as_carte.id_carte";
 	$res_r6_user = $mysqli->query($sql_r6_user);
 	$nb_ench_user = $res_r6_user->num_rows;
+	
+	// Nouvelles raretés 7 et 8 pour l'utilisateur
+	$sql_r7_user = "SELECT user_as_carte.id_carte FROM user_as_carte, cartes WHERE user_as_carte.id_carte = cartes.id_carte AND user_as_carte.id_user='$id_user' AND rarete='7' AND chapitre='$choix_collection' GROUP BY user_as_carte.id_carte";
+	$res_r7_user = $mysqli->query($sql_r7_user);
+	$nb_epic_user = $res_r7_user->num_rows;
+	
+	$sql_r8_user = "SELECT user_as_carte.id_carte FROM user_as_carte, cartes WHERE user_as_carte.id_carte = cartes.id_carte AND user_as_carte.id_user='$id_user' AND rarete='8' AND chapitre='$choix_collection' GROUP BY user_as_carte.id_carte";
+	$res_r8_user = $mysqli->query($sql_r8_user);
+	$nb_iconique_user = $res_r8_user->num_rows;
 ?>
 <!doctype html>
 <html lang="en" data-bs-theme="auto">
@@ -322,6 +340,14 @@ if (isset($_SESSION["id_user"]) && isset($_GET['collection'])) {
 		<img title='enchantees' onclick="afficher_enchantees()" id="rarete6_disable" src='img/r6_disabled.png' class="img-fluid" style='display:none;' />
 		<?php echo $nb_ench_user."/".$nb_ench; ?>
 		
+		<img title='epiques' onclick="effacer_epiques()" id="rarete7" src='img/rarete_7.png' class="img-fluid" />
+		<img title='epiques' onclick="afficher_epiques()" id="rarete7_disable" src='img/r7_disabled.png' class="img-fluid" style='display:none;' />
+		<?php echo $nb_epic_user."/".$nb_epic; ?>
+		
+		<img title='iconiques' onclick="effacer_iconiques()" id="rarete8" src='img/rarete_8.png' class="img-fluid" />
+		<img title='iconiques' onclick="afficher_iconiques()" id="rarete8_disable" src='img/r8_disabled.png' class="img-fluid" style='display:none;' />
+		<?php echo $nb_iconique_user."/".$nb_iconique; ?>
+		
 		<span class="material-icons" style='cursor:pointer;float:right' id='icon_afficher_min' onclick="afficher_min()">view_module</span>
 		<span class="material-icons" style='cursor:pointer;float:right;display:none' id='icon_afficher_image' onclick="afficher_image()">image</span>
       </div>
@@ -398,6 +424,8 @@ if (isset($_SESSION["id_user"]) && isset($_GET['collection'])) {
 			elseif ($rarete == 4) { echo "trare "; } 
 			elseif ($rarete == 5) { echo "legendaire "; } 
 			elseif ($rarete == 6) { echo "enchantee "; }
+			elseif ($rarete == 7) { echo "epic "; }
+			elseif ($rarete == 8) { echo "iconique "; }
 			
 			// Ajout class rareté pour filtre par encre
 			if ($encre == 1) { echo "ambre"; } 
@@ -902,6 +930,44 @@ if (isset($_SESSION["id_user"]) && isset($_GET['collection'])) {
 		
 		document.getElementById('rarete6_disable').style.display = 'none';
 		document.getElementById('rarete6').style.display = '';
+	}
+	
+	// EPICS
+	function effacer_epiques() {
+		document.querySelectorAll('.epic').forEach(function(el) {
+		   el.style.display = 'none';
+		});
+		
+		document.getElementById('rarete7_disable').style.display = '';
+		document.getElementById('rarete7').style.display = 'none';
+	}
+	
+	function afficher_epiques() {
+		document.querySelectorAll('.epic').forEach(function(el) {
+		   el.style.display = '';
+		});
+		
+		document.getElementById('rarete7_disable').style.display = 'none';
+		document.getElementById('rarete7').style.display = '';
+	}
+	
+	// ICONIQUES
+	function effacer_iconiques() {
+		document.querySelectorAll('.iconique').forEach(function(el) {
+		   el.style.display = 'none';
+		});
+		
+		document.getElementById('rarete8_disable').style.display = '';
+		document.getElementById('rarete8').style.display = 'none';
+	}
+	
+	function afficher_iconiques() {
+		document.querySelectorAll('.iconique').forEach(function(el) {
+		   el.style.display = '';
+		});
+		
+		document.getElementById('rarete8_disable').style.display = 'none';
+		document.getElementById('rarete8').style.display = '';
 	}
 	
 	// AMBRE
