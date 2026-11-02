@@ -488,7 +488,7 @@ if (isset($_SESSION["id_user"]) && isset($_GET['collection'])) {
 					<input type='submit' id='add_card_<?php echo $id_carte; ?>' name='add_card_<?php echo $id_carte; ?>' value='<?php echo $nb_nf; ?>' />
 				  </form>
 				<?php 
-				if ($rarete != 6) {
+				if ($rarete != 6 && $rarete != 7 && $rarete != 8) {
 				?>
 				  <form method='POST' onsubmit="return sendDataFoil(<?php echo $id_carte.",".$nb_f; ?>);">
 					<input type='submit' id='add_card_foil_<?php echo $id_carte; ?>' name='add_card_foil_<?php echo $id_carte; ?>' value='<?php echo $nb_f; ?>' />
