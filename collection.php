@@ -276,6 +276,28 @@ if (isset($_SESSION["id_user"]) && isset($_GET['collection'])) {
 	  .main-content {
 		padding-bottom: 100px; /* Adjust based on footer height */
 	  }
+	  
+	  /* Search bar styles */
+	  .search-container {
+		display: flex;
+		align-items: center;
+		margin-right: 15px;
+	  }
+	  
+	  .search-input {
+		width: 200px;
+		padding: 5px 10px;
+		border: 1px solid #ccc;
+		border-radius: 4px;
+		font-size: 14px;
+		outline: none;
+		transition: border-color 0.3s ease;
+	  }
+	  
+	  .search-input:focus {
+		border-color: #007bff;
+		box-shadow: 0 0 0 2px rgba(0,123,255,.25);
+	  }
     </style>
 
     
@@ -284,9 +306,14 @@ if (isset($_SESSION["id_user"]) && isset($_GET['collection'])) {
   
 <header data-bs-theme="dark" class="sticky-header">
   <div class="navbar-dark bg-dark shadow-sm">
-    <div class="container d-flex align-items-center">
+    <div class="container d-flex align-items-center justify-content-between">
       <a href="liste_collection.php"><img src="./img/logo.png" alt="" width="52" height="72"></a>
 	  <a href="collection.php?collection=<?php echo $choix_collection; ?>"><strong><?php echo $nom_chapitre; ?></strong></a>
+      
+      <!-- Search bar added here -->
+      <div class="search-container">
+        <input type="text" id="searchInput" class="search-input" placeholder="Rechercher..." onkeyup="filterCards()">
+      </div>
     </div>
   </div>
 </header>
@@ -357,7 +384,7 @@ if (isset($_SESSION["id_user"]) && isset($_GET['collection'])) {
   <div class="album py-2 bg-body-tertiary">
     <div class="container">
 	
-      <div class="row row-cols-3 row-cols-sm-4 row-cols-md-6 g-2">
+      <div class="row row-cols-2 row-cols-sm-4 row-cols-md-6 g-2">
 		<?php
 		
 		$choix_affichage = 1;
@@ -392,6 +419,7 @@ if (isset($_SESSION["id_user"]) && isset($_GET['collection'])) {
 			$cat_carte	= $t_cartes["categorie_carte"];
 			$rarete		= $t_cartes["rarete"];
 			$encre		= $t_cartes["encre"];
+			$artiste	= $t_cartes["artiste"];
 			$image_url	= $t_cartes["image"];
 			
 			// Nombre non foil
@@ -434,7 +462,7 @@ if (isset($_SESSION["id_user"]) && isset($_GET['collection'])) {
 			elseif ($encre == 4) { echo "rubis"; } 
 			elseif ($encre == 5) { echo "saphir"; } 
 			elseif ($encre == 6) { echo "acier"; }
-		?>">
+		?>" id="card_<?php echo $id_carte; ?>" data-name="<?php echo strtolower($nom_carte); ?>" data-category="<?php echo strtolower($cat_carte); ?>" data-artist="<?php echo strtolower($artiste); ?>">
 		<?php
         echo "<div id='img_background_".$id_carte."' class='card shadow-sm";
 		if ($nb_nf + $nb_f >= 4) {
@@ -1122,6 +1150,27 @@ if (isset($_SESSION["id_user"]) && isset($_GET['collection'])) {
 		
 		
 	});
+	
+	// Search functionality
+	function filterCards() {
+		const input = document.getElementById('searchInput');
+		const filter = input.value.toLowerCase();
+		const cards = document.querySelectorAll('.col');
+		
+		cards.forEach(card => {
+			// Get card details from data attributes
+			const nom_carte = card.getAttribute('data-name') || '';
+			const categorie_carte = card.getAttribute('data-category') || '';
+			const artiste = card.getAttribute('data-artist') || '';
+			
+			// Check if the card matches the search criteria
+			if (nom_carte.includes(filter) || categorie_carte.includes(filter) || artiste.includes(filter)) {
+				card.style.display = '';
+			} else {
+				card.style.display = 'none';
+			}
+		});
+	}
 </script>
 
   </body>
