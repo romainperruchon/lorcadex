@@ -39,7 +39,18 @@ if (isset($_SESSION["id_user"]) && isset($_GET['artiste'])) {
         right: 10px;
         background-color: rgba(0, 0, 0, 0.7);
         color: white;
-        padding: 3px 8px;
+        padding: 1px 8px;
+        border-radius: 12px;
+        font-size: 0.8rem;
+      }
+
+	  .collection-badge-foil {
+        position: absolute;
+        top: 40px;
+        right: 10px;
+        background-color: rgba(204, 191, 6, 0.7);
+        color: white;
+        padding: 1px 8px;
         border-radius: 12px;
         font-size: 0.8rem;
       }
@@ -93,13 +104,20 @@ if (isset($_SESSION["id_user"]) && isset($_GET['artiste'])) {
 			$quantite = 0;
 			$foil = 0;
 			
-			$sql_user_card = "SELECT quantite, foil FROM user_as_carte WHERE id_user = '$id_user' AND id_carte = '$id_carte'";
+			$sql_user_card = "SELECT quantite FROM user_as_carte WHERE foil=0 AND id_user = '$id_user' AND id_carte = '$id_carte'";
 			$res_user_card = $mysqli->query($sql_user_card);
-			
+
 			if ($res_user_card->num_rows > 0) {
 				$user_card = $res_user_card->fetch_assoc();
 				$quantite = $user_card['quantite'];
-				$foil = $user_card['foil'];
+			}
+
+			$sql_user_card_foil = "SELECT quantite FROM user_as_carte WHERE foil=1 AND id_user = '$id_user' AND id_carte = '$id_carte'";
+			$res_user_card_foil = $mysqli->query($sql_user_card_foil);
+
+			if ($res_user_card_foil->num_rows > 0) {
+				$user_card_foil = $res_user_card_foil->fetch_assoc();
+				$foil = $user_card_foil['quantite'];
 			}
 			
 			echo "<div class='col'>";
@@ -109,12 +127,12 @@ if (isset($_SESSION["id_user"]) && isset($_GET['artiste'])) {
 			if ($quantite > 0) {
 				echo "<span class='collection-badge'>" . $quantite . "</span>";
 			}
+			if ($foil > 0) {
+				echo "<span class='collection-badge-foil'>" . $foil . "</span>";
+			}
 			echo "</div>";
 			echo "<div class='card-body'>";
 			echo "<h6 class='card-title text-center'>" . htmlspecialchars($nom_carte) . "</h6>";
-			if ($foil == 1) {
-				echo "<p class='text-center'><small class='text-muted'>Foil</small></p>";
-			}
 			echo "<div class='d-grid gap-2'>";
 			echo "<a href='detail_carte.php?id_carte=" . $id_carte . "' class='btn btn-sm btn-outline-primary'>Détails</a>";
 			echo "</div>";

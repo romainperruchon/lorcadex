@@ -492,7 +492,7 @@ if (isset($_SESSION["id_user"]) && isset($_GET['collection'])) {
 				} else {
 					$image_src = $image_url;
 				}
-				echo "<a href='".$local_image_path."' class='image_carte' data-toggle=\"lightbox\" data-gallery=\"chapitre1\" />";
+				echo "<a href='".$image_src."' class='image_carte' data-toggle=\"lightbox\" data-gallery=\"chapitre1\" />";
 				echo "\t<img src='".$image_src."' width='100%' height='100%' id='img_card_".$id_carte."' class='img-fluid img-thumbnail";
 
 				if ($nb_nf > 0 || $nb_f > 0) {
