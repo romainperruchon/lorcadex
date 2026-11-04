@@ -59,7 +59,7 @@ if(isset ($_POST['email']) && isset ($_POST['password'])) {
 					
 					setcookie('remember_me', $token, $expired_seconds);
 							
-					header("location:liste_collection.php");
+					header("location:dashboard.php");
 				}
 				else {
 					echo "<center><font color='red'>mot de passe incorrect<br />";
