@@ -53,11 +53,10 @@ if (isset($_SESSION["id_user"]) && isset($_GET['artiste'])) {
 	  </div>
 	  
 	  <?php
-	  // Get all cards from this artist for the user
-	  $sql = "SELECT ca.*, uac.quantite, uac.foil 
+	  // Get all cards from this artist (regardless of user ownership)
+	  $sql = "SELECT ca.* 
 	          FROM cartes AS ca 
-	          JOIN user_as_carte AS uac ON ca.id_carte = uac.id_carte
-	          WHERE uac.id_user = '$id_user' AND ca.artiste = '$artiste'
+	          WHERE ca.artiste = '$artiste'
 	          ORDER BY ca.chapitre, ca.numero_carte";
 	  
 	  $res_cards = $mysqli->query($sql);
@@ -72,8 +71,6 @@ if (isset($_SESSION["id_user"]) && isset($_GET['artiste'])) {
 			$rarete = $card['rarete'];
 			$encre = $card['encre'];
 			$image_url = $card['image'];
-			$quantite = $card['quantite'];
-			$foil = $card['foil'];
 			
 			// Get the chapter name for this card
 			$sql_chapter = "SELECT nom_chapitre FROM chapitres WHERE id_chapitre = " . $card['chapitre'];
@@ -89,6 +86,19 @@ if (isset($_SESSION["id_user"]) && isset($_GET['artiste'])) {
 				$img_src = $local_image_path;
 			} else {
 				$img_src = $image_url;
+			}
+			
+			// Check if user owns this card
+			$quantite = 0;
+			$foil = 0;
+			
+			$sql_user_card = "SELECT quantite, foil FROM user_as_carte WHERE id_user = '$id_user' AND id_carte = '$id_carte'";
+			$res_user_card = $mysqli->query($sql_user_card);
+			
+			if ($res_user_card->num_rows > 0) {
+				$user_card = $res_user_card->fetch_assoc();
+				$quantite = $user_card['quantite'];
+				$foil = $user_card['foil'];
 			}
 			
 			echo "<div class='col'>";

@@ -72,6 +72,10 @@ if (isset($_SESSION["id_user"])) {
   <body>
   
   <main>
+	<div class="container-fluid mb-3">
+		<a href="dashboard.php" class="btn btn-primary">← Retour au tableau de bord</a>
+	</div>
+	
 	<div class="container">
 	
 	<?php
