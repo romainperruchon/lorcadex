@@ -77,9 +77,10 @@ if (isset($_SESSION["id_user"]) && isset($_GET['artiste'])) {
 			$res_chapter = $mysqli->query($sql_chapter);
 			$chapter_data = $res_chapter->fetch_assoc();
 			$chapter_name = $chapter_data['nom_chapitre'];
+			$chapter_folder = "Chapitre ".$card['chapitre'];
 			
 			// Construct local image path
-			$local_image_path = 'cartes/FR/'.$chapter_name.'/'.$num_carte.'.jpg';
+			$local_image_path = 'cartes/FR/'.$chapter_folder.'/'.$num_carte.'.jpg';
 			
 			// Check if the local image exists, otherwise use the URL from database
 			if (file_exists($local_image_path)) {

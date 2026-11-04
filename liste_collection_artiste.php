@@ -57,7 +57,16 @@ if (isset($_SESSION["id_user"])) {
 		while ($artist = $res_artists->fetch_assoc()) {
 			$artist_name = $artist['artiste'];
 			
-			// Count total cards for this artist
+			// Count total cards for this artist (in the entire database)
+			$sql_total_artist = "SELECT COUNT(*) as total_artist_cards 
+						  FROM cartes AS c 
+						  WHERE c.artiste = '$artist_name'";
+			
+			$res_total_artist = $mysqli->query($sql_total_artist);
+			$total_artist_data = $res_total_artist->fetch_assoc();
+			$total_artist_cards = $total_artist_data['total_artist_cards'];
+			
+			// Count total cards for this artist in user's collection
 			$sql_count = "SELECT COUNT(*) as total_cards 
 						  FROM cartes AS c 
 						  JOIN user_as_carte AS uac ON c.id_carte = uac.id_carte
@@ -67,7 +76,7 @@ if (isset($_SESSION["id_user"])) {
 			$count_data = $res_count->fetch_assoc();
 			$total_cards = $count_data['total_cards'];
 			
-			// Count foil cards for this artist
+			// Count foil cards for this artist in user's collection
 			$sql_foil = "SELECT COUNT(*) as foil_cards 
 						 FROM cartes AS c 
 						 JOIN user_as_carte AS uac ON c.id_carte = uac.id_carte
@@ -86,6 +95,7 @@ if (isset($_SESSION["id_user"])) {
 			echo "</div>";
 			echo "<h5 class='card-title'>" . htmlspecialchars($artist_name) . "</h5>";
 			echo "<p class='card-text'>" . $total_cards . " cartes (" . $foil_cards . " foil)</p>";
+			echo "<p class='card-text'>Total : " . $total_artist_cards . " cartes</p>";
 			echo "</div>";
 			echo "</div>";
 			echo "</a>";

@@ -119,10 +119,7 @@ if (!file_exists($filename)) {
 $json = json_decode($content, true);
 
 
-// Supprimer les cartes existantes pour ce chapitre avant l'insertion
-$delete_sql = "DELETE FROM cartes WHERE chapitre = $chapter";
-$mysqli->query($delete_sql);
-
+// Pour chaque carte dans le JSON
 foreach($json['cards'] as $carte) {
 	
 	$rarity = $carte['rarity'];
@@ -209,10 +206,44 @@ foreach($json['cards'] as $carte) {
 		
 		$image = $carte['images']['full'];
 		
-		$sql = "INSERT INTO cartes (numero_carte, ordre, nom_carte, categorie_carte, cout_carte, force_carte, volonte_carte, lore_carte, type_carte, encre, encre2, rarete, encrable, inssaisissable, rempart, soutien, hors_atteinte, charge, combattant, boost, image, artiste, chapitre) 
-		VALUES ($num, $num, '$nom', '$ssType', $cout, $force, $volonte, $lore, '$type', $couleur1, $couleur2, $rarete, $encrable, $insaisissable, $rempart, $soutien, $hors_atteinte, $charge, $combattant, $boost, '$image', '$artist', $chapitre)";		
+		// Vérifier si la carte existe déjà
+		$check_sql = "SELECT id_carte FROM cartes WHERE numero_carte = '$num' AND chapitre = $chapitre";
+		$result = $mysqli->query($check_sql);
 		
-		$mysqli->query($sql);
+		if ($result && $result->num_rows > 0) {
+			// La carte existe, on la met à jour
+			$update_sql = "UPDATE cartes SET 
+				ordre = $num,
+				nom_carte = '$nom',
+				categorie_carte = '$ssType',
+				cout_carte = $cout,
+				force_carte = $force,
+				volonte_carte = $volonte,
+				lore_carte = $lore,
+				type_carte = '$type',
+				encre = $couleur1,
+				encre2 = $couleur2,
+				rarete = $rarete,
+				encrable = $encrable,
+				inssaisissable = $insaisissable,
+				rempart = $rempart,
+				soutien = $soutien,
+				hors_atteinte = $hors_atteinte,
+				charge = $charge,
+				combattant = $combattant,
+				boost = $boost,
+				image = '$image',
+				artiste = '$artist'
+				WHERE numero_carte = '$num' AND chapitre = $chapitre";
+			
+			$mysqli->query($update_sql);
+		} else {
+			// La carte n'existe pas, on l'insère
+			$insert_sql = "INSERT INTO cartes (numero_carte, ordre, nom_carte, categorie_carte, cout_carte, force_carte, volonte_carte, lore_carte, type_carte, encre, encre2, rarete, encrable, inssaisissable, rempart, soutien, hors_atteinte, charge, combattant, boost, image, artiste, chapitre) 
+			VALUES ($num, $num, '$nom', '$ssType', $cout, $force, $volonte, $lore, '$type', $couleur1, $couleur2, $rarete, $encrable, $insaisissable, $rempart, $soutien, $hors_atteinte, $charge, $combattant, $boost, '$image', '$artist', $chapitre)";
+			
+			$mysqli->query($insert_sql);
+		}
 	}
 	
 }

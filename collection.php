@@ -14,6 +14,7 @@ if (isset($_SESSION["id_user"]) && isset($_GET['collection'])) {
 	$t = $res->fetch_assoc();
 	
 	$nom_chapitre = $t['nom_chapitre'];
+	$chapitre_folder = "Chapitre ".$choix_collection;
 		
 	// Récupération du nombre de cartes par rareté
 	$sql_r1 = "SELECT id_carte FROM cartes WHERE rarete='1' AND chapitre='$choix_collection'";
@@ -483,7 +484,7 @@ if (isset($_SESSION["id_user"]) && isset($_GET['collection'])) {
 				</div>
 				<?php 
 				// Construct local image path
-				$local_image_path = 'cartes/FR/'.$nom_chapitre.'/'.$num_carte.'.jpg';
+				$local_image_path = 'cartes/FR/'.$chapitre_folder.'/'.$num_carte.'.jpg';
 				
 				// Check if the local image exists, otherwise use the URL from database
 				if (file_exists($local_image_path)) {
