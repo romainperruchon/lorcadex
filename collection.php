@@ -378,6 +378,13 @@ if (isset($_SESSION["id_user"]) && isset($_GET['collection'])) {
 		border-color: #007bff;
 		box-shadow: 0 0 0 2px rgba(0,123,255,.25);
 	  }
+	  
+	  /* Add padding-top for mobile view (row-cols-2) */
+	  @media (max-width: 575.98px) {
+		.row.row-cols-2 {
+			padding-top: 60px;
+		}
+	  }
     </style>
 
     
