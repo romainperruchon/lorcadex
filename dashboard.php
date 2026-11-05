@@ -24,6 +24,9 @@ if (isset($_SESSION["id_user"])) {
 	
 	<link href="./assets/dist/css/bootstrap.min.css" rel="stylesheet">
 	
+	<!-- Material Icons -->
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+	
 	<style>
       .bd-placeholder-img {
         font-size: 1.125rem;
