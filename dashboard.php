@@ -140,7 +140,7 @@ if (isset($_SESSION["id_user"])) {
 		
 		<!-- Toutes les cartes -->
 		<div class="col">
-		  <a href="toutes_les_cartes.php" class="text-decoration-none">
+		  <a href="collection.php?collection=all" class="text-decoration-none">
 			<div class="card dashboard-card h-100 border-success">
 			  <div class="card-body text-center">
 				<div class="card-icon text-success">

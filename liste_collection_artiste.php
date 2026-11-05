@@ -94,7 +94,7 @@ if (isset($_SESSION["id_user"])) {
 			echo "<span class='material-icons'>person</span>";
 			echo "</div>";
 			echo "<h5 class='card-title'>" . htmlspecialchars($artist_name) . "</h5>";
-			echo "<p class='card-text'>" . $total_cards . " cartes (" . $foil_cards . " foil)</p>";
+			echo "<p class='card-text'>Possédées : " . $total_cards . " cartes (Dont " . $foil_cards . " foil)</p>";
 			echo "<p class='card-text'>Total : " . $total_artist_cards . " cartes</p>";
 			echo "</div>";
 			echo "</div>";
