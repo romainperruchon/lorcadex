@@ -14,7 +14,7 @@ if (isset($_SESSION["id_user"]) && isset($_GET['collection'])) {
 	
 	if ($display_all) {
 		// For "all", we don't need to get chapter name or folder
-		$nom_chapitre = "Toutes les cartes";
+		$nom_chapitre = "Toutes";
 		$chapitre_folder = "";
 	} else {
 		$sql = "SELECT nom_chapitre FROM chapitres WHERE id_chapitre='$choix_collection'";
@@ -409,7 +409,7 @@ if (isset($_SESSION["id_user"]) && isset($_GET['collection'])) {
 
   <section class="py-1 text-center sticky-filters">
     <div class="row">
-	  <div class="col-6">
+	  <div class="col-5">
 		<img title='ambres' onclick="effacer_ambres()" id="encre1" src='img/encre1.png' class="img-fluid" />
 		<img title='ambres' onclick="afficher_ambres()" id="encre1_disable" src='img/e1 - disabled.png' class="img-fluid" style='display:none;' />
 	  
@@ -428,7 +428,7 @@ if (isset($_SESSION["id_user"]) && isset($_GET['collection'])) {
 		<img title='aciers' onclick="effacer_aciers()" id="encre6" src='img/encre6.png' class="img-fluid" />
 		<img title='aciers' onclick="afficher_aciers()" id="encre6_disable" src='img/e6 - disabled.png' class="img-fluid" style='display:none;' />
 	  </div>
-      <div class="col-6">
+      <div class="col-7">
 		
 		<img title='communes' onclick="effacer_communes()" id="rarete1" src='img/rarete_1.png' class="img-fluid" />
 		<img title='communes' onclick="afficher_communes()" id="rarete1_disable" src='img/r1_disabled.png' class="img-fluid" style='display:none;' />
