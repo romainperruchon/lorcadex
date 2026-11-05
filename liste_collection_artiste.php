@@ -28,9 +28,11 @@ if (isset($_SESSION["id_user"])) {
         transform: scale(1.02);
       }
       
-      .artist-icon {
-        font-size: 3rem;
-        margin-bottom: 1rem;
+      .artist-card-img {
+        height: 150px;
+        object-fit: cover;
+        border-top-left-radius: 0.375rem;
+        border-top-right-radius: 0.375rem;
       }
     </style>
   </head>
@@ -115,13 +117,34 @@ if (isset($_SESSION["id_user"])) {
 			$foil_data = $res_foil->fetch_assoc();
 			$foil_cards = $foil_data['foil_cards'];
 			
+			// Get one card from this artist for display (from user's collection)
+			$sql_card = "SELECT c.image, c.nom_carte, c.id_carte
+						 FROM cartes AS c 
+						 JOIN user_as_carte AS uac ON c.id_carte = uac.id_carte
+						 WHERE uac.id_user = ? AND c.artiste = ?
+						 ORDER BY c.id_carte ASC
+						 LIMIT 1";
+			
+			$stmt_card = $mysqli->prepare($sql_card);
+			$stmt_card->bind_param("is", $id_user, $artist_name);
+			$stmt_card->execute();
+			$res_card = $stmt_card->get_result();
+			
+			// Default image if no card found in user's collection
+			$card_image = "./assets/images/default-card.png";
+			$card_title = "Carte de l'artiste";
+			
+			if ($res_card && $res_card->num_rows > 0) {
+				$card_data = $res_card->fetch_assoc();
+				$card_image = $card_data['image'];
+				$card_title = $card_data['nom_carte'];
+			}
+			
 			echo "<div class='col'>";
 			echo "<a href='collection_artiste.php?artiste=" . urlencode($artist_name) . "' class='text-decoration-none'>";
 			echo "<div class='card artist-card h-100 border-info'>";
+			echo "<img src='" . htmlspecialchars($card_image) . "' class='artist-card-img' alt='" . htmlspecialchars($card_title) . "'>";
 			echo "<div class='card-body text-center'>";
-			echo "<div class='artist-icon text-info'>";
-			echo "<span class='material-icons'>person</span>";
-			echo "</div>";
 			echo "<h5 class='card-title'>" . htmlspecialchars($artist_name) . "</h5>";
 			echo "<p class='card-text'>Possédées : " . $total_cards . " cartes (Dont " . $foil_cards . " foil)</p>";
 			echo "<p class='card-text'>Total : " . $total_artist_cards . " cartes</p>";
