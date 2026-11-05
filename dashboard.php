@@ -167,6 +167,21 @@ if (isset($_SESSION["id_user"])) {
 			</div>
 		  </a>
 		</div>
+		
+		<!-- Statistiques -->
+		<div class="col">
+		  <a href="statistiques.php" class="text-decoration-none">
+			<div class="card dashboard-card h-100 border-info">
+			  <div class="card-body text-center">
+				<div class="card-icon text-info">
+				  <span class="material-icons">bar_chart</span>
+				</div>
+				<h5 class="card-title">Statistiques</h5>
+				<p class="card-text">Voir les statistiques de votre collection</p>
+			  </div>
+			</div>
+		  </a>
+		</div>
 	  </div>
 	</main>
 	

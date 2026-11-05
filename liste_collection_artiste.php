@@ -37,7 +37,24 @@ if (isset($_SESSION["id_user"])) {
   <body>	
 	<main class="container py-4">
 	  <div class="d-flex justify-content-between align-items-center mb-4">
-		<h1>Collection par artiste</h1>
+		<h1>Collection par artiste 
+		<?php
+		// Get the count of distinct artists
+		$count_sql = "SELECT COUNT(DISTINCT(c.artiste)) as artist_count
+		              FROM cartes AS c 
+		              JOIN user_as_carte AS uac ON c.id_carte = uac.id_carte
+		              WHERE uac.id_user = ? AND c.artiste IS NOT NULL AND c.artiste != ''";
+		
+		$count_stmt = $mysqli->prepare($count_sql);
+		$count_stmt->bind_param("i", $id_user);
+		$count_stmt->execute();
+		$count_result = $count_stmt->get_result();
+		$count_data = $count_result->fetch_assoc();
+		$artist_count = $count_data['artist_count'];
+		
+		echo "(" . $artist_count . " artiste" . ($artist_count > 1 ? "s" : "") . ")";
+		?>
+		</h1>
 		<a href="dashboard.php" class="btn btn-secondary">Retour au tableau de bord</a>
 	  </div>
 	  
@@ -46,10 +63,13 @@ if (isset($_SESSION["id_user"])) {
 	  $sql = "SELECT DISTINCT(c.artiste) 
 	          FROM cartes AS c 
 	          JOIN user_as_carte AS uac ON c.id_carte = uac.id_carte
-	          WHERE uac.id_user = '$id_user' AND c.artiste IS NOT NULL AND c.artiste != ''
+	          WHERE uac.id_user = ? AND c.artiste IS NOT NULL AND c.artiste != ''
 	          ORDER BY c.artiste";
 	  
-	  $res_artists = $mysqli->query($sql);
+	  $stmt = $mysqli->prepare($sql);
+	  $stmt->bind_param("i", $id_user);
+	  $stmt->execute();
+	  $res_artists = $stmt->get_result();
 	  
 	  if ($res_artists->num_rows > 0) {
 		echo "<div class='row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4'>";
@@ -60,9 +80,12 @@ if (isset($_SESSION["id_user"])) {
 			// Count total cards for this artist (in the entire database)
 			$sql_total_artist = "SELECT COUNT(*) as total_artist_cards 
 						  FROM cartes AS c 
-						  WHERE c.artiste = '$artist_name'";
+						  WHERE c.artiste = ?";
 			
-			$res_total_artist = $mysqli->query($sql_total_artist);
+			$stmt_total = $mysqli->prepare($sql_total_artist);
+			$stmt_total->bind_param("s", $artist_name);
+			$stmt_total->execute();
+			$res_total_artist = $stmt_total->get_result();
 			$total_artist_data = $res_total_artist->fetch_assoc();
 			$total_artist_cards = $total_artist_data['total_artist_cards'];
 			
@@ -70,9 +93,12 @@ if (isset($_SESSION["id_user"])) {
 			$sql_count = "SELECT COUNT(*) as total_cards 
 						  FROM cartes AS c 
 						  JOIN user_as_carte AS uac ON c.id_carte = uac.id_carte
-						  WHERE uac.id_user = '$id_user' AND c.artiste = '$artist_name'";
+						  WHERE uac.id_user = ? AND c.artiste = ?";
 			
-			$res_count = $mysqli->query($sql_count);
+			$stmt_count = $mysqli->prepare($sql_count);
+			$stmt_count->bind_param("is", $id_user, $artist_name);
+			$stmt_count->execute();
+			$res_count = $stmt_count->get_result();
 			$count_data = $res_count->fetch_assoc();
 			$total_cards = $count_data['total_cards'];
 			
@@ -80,9 +106,12 @@ if (isset($_SESSION["id_user"])) {
 			$sql_foil = "SELECT COUNT(*) as foil_cards 
 						 FROM cartes AS c 
 						 JOIN user_as_carte AS uac ON c.id_carte = uac.id_carte
-						 WHERE uac.id_user = '$id_user' AND c.artiste = '$artist_name' AND uac.foil = 1";
+						 WHERE uac.id_user = ? AND c.artiste = ? AND uac.foil = 1";
 			
-			$res_foil = $mysqli->query($sql_foil);
+			$stmt_foil = $mysqli->prepare($sql_foil);
+			$stmt_foil->bind_param("is", $id_user, $artist_name);
+			$stmt_foil->execute();
+			$res_foil = $stmt_foil->get_result();
 			$foil_data = $res_foil->fetch_assoc();
 			$foil_cards = $foil_data['foil_cards'];
 			
