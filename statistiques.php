@@ -54,6 +54,18 @@ if (isset($_SESSION["id_user"])) {
 		$type_data[] = $row;
 	}
 	
+	// Fonction pour convertir les numéros de type en libellés
+	function getTypeLabel($typeNumber) {
+		switch($typeNumber) {
+			case 1: return "Personnage";
+			case 2: return "Action";
+			case 3: return "Objet";
+			case 4: return "Chanson";
+			case 5: return "Lieu";
+			default: return $typeNumber;
+		}
+	}
+	
 ?>
 <!doctype html>
 <html lang="fr" data-bs-theme="auto">
@@ -275,7 +287,13 @@ if (isset($_SESSION["id_user"])) {
 						</div>`;
 					
 					const ctx3 = document.getElementById('typeChart').getContext('2d');
-					const typeLabels = <?php echo json_encode(array_column($type_data, 'type_carte')); ?>;
+					// Convertir les numéros en libellés
+					let typeLabels = [];
+					<?php
+					foreach ($type_data as $row) {
+						echo "typeLabels.push('" . getTypeLabel($row['type_carte']) . "');";
+					}
+					?>
 					const typeData = <?php echo json_encode(array_column($type_data, 'count')); ?>;
 					
 					createChart(ctx3, typeData, typeLabels, 'Nombre de cartes', 'rgba(255, 205, 86, 0.2)');
