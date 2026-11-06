@@ -239,12 +239,14 @@ if (isset($_SESSION["id_user"])) {
 					break;
 					
 				case 'artistes-diff':
+					// Afficher un bouton pour basculer entre vue graphique et tableau
 					contentDiv.innerHTML = `
 						<div class="card">
-							<div class="card-header">
+							<div class="card-header d-flex justify-content-between align-items-center">
 								<h4>Répartition par artiste</h4>
+								<button id="switchView" class="btn btn-outline-primary btn-sm">Basculer vers le tableau</button>
 							</div>
-							<div class="card-body chart-container">
+							<div class="card-body chart-container" id="artistes-content">
 								<canvas id="artisteChart"></canvas>
 							</div>
 						</div>`;
@@ -254,6 +256,11 @@ if (isset($_SESSION["id_user"])) {
 					const artisteData = <?php echo json_encode(array_column($artiste_data, 'count')); ?>;
 					
 					createChart(ctx2, artisteData, artisteLabels, 'Nombre de cartes', 'rgba(54, 162, 235, 0.2)');
+					
+					// Ajouter l'événement pour le bouton de basculement
+					document.getElementById('switchView').addEventListener('click', function() {
+						switchToTableView();
+					});
 					break;
 					
 				case 'types-cartes':
@@ -277,6 +284,41 @@ if (isset($_SESSION["id_user"])) {
 				default:
 					contentDiv.innerHTML = '';
 			}
+		}
+
+		// Fonction pour basculer vers la vue tableau
+		function switchToTableView() {
+			const contentDiv = document.getElementById('chart-content');
+			const artistesContent = document.getElementById('artistes-content');
+			
+			// Créer le tableau HTML avec les données des artistes
+			let tableHtml = '<table class="table table-striped table-bordered">';
+			tableHtml += '<thead><tr><th>Artiste</th><th>Nombre de cartes</th></tr></thead><tbody>';
+			
+			<?php
+			foreach ($artiste_data as $row) {
+				echo "tableHtml += '<tr><td>" . addslashes($row['artiste']) . "</td><td>" . $row['count'] . "</td></tr>';";
+			}
+			?>
+			
+			tableHtml += '</tbody></table>';
+			
+			// Remplacer le contenu par le tableau
+			contentDiv.innerHTML = `
+				<div class="card">
+					<div class="card-header d-flex justify-content-between align-items-center">
+						<h4>Répartition par artiste</h4>
+						<button id="switchViewBack" class="btn btn-outline-primary btn-sm">Basculer vers le graphique</button>
+					</div>
+					<div class="card-body table-responsive" id="artistes-content">
+						` + tableHtml + `
+					</div>
+				</div>`;
+			
+			// Ajouter l'événement pour basculer en arrière
+			document.getElementById('switchViewBack').addEventListener('click', function() {
+				showDetails('artistes-diff');
+			});
 		}
 
 		// Ajouter les événements clic aux cartes
