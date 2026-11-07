@@ -255,11 +255,40 @@ if (isset($_SESSION["id_user"])) {
 						<div class="row mb-3">
 							<div class="col-4 fw-bold">Description:</div>
 							<div class="col-8"><?php 
-                                // Rechercher les occurrences de "Mélomane X" et les mettre en gras
+                                // Rechercher les occurrences de tous les mots-clés et les mettre en gras
                                 $description_affichee = htmlspecialchars($description);
-                                // Utiliser une expression régulière pour trouver "Mélomane" suivi d'un nombre
-                                $pattern = '/Mélomane\s+(\d+)/i';
-                                $description_affichee = preg_replace($pattern, '<strong>Mélomane $1</strong>', $description_affichee);
+                                
+                                // Mots-clés avec nombres
+                                $patterns = [
+                                    '/Alter\s+(\d+)/i' => '<strong>Alter $1</strong>',
+                                    '/À l\'unisson\s+(\d+)/i' => '<strong>À l\'unisson $1</strong>',
+                                    '/Offensif \+\s*(\d+)/i' => '<strong>Offensif +$1</strong>',
+									'/Mélomane \s*(\d+)/i' => '<strong>Mélomane $1</strong>'
+                                ];
+                                
+                                // Mots-clés simples
+                                $simple_patterns = [
+									'Rempart' => '<strong>Rempart</strong>',
+									'Mélomane' => '<strong>Mélomane</strong>',
+                                    'Soutien' => '<strong>Soutien</strong>',
+                                    'Appel de l\'aventure' => '<strong>Appel de l\'aventure</strong>',
+                                    'Insaisissable' => '<strong>Insaisissable</strong>',
+                                    'Charge' => '<strong>Charge</strong>',
+                                    'Résistance' => '<strong>Résistance</strong>',
+                                    'Agilité' => '<strong>Agilité</strong>',
+                                    'Hors d\'atteinte' => '<strong>Hors d\'atteinte</strong>'
+                                ];
+                                
+                                // Appliquer les patterns avec nombres
+                                foreach ($patterns as $pattern => $replacement) {
+                                    $description_affichee = preg_replace($pattern, $replacement, $description_affichee);
+                                }
+                                
+                                // Appliquer les patterns simples
+                                foreach ($simple_patterns as $keyword => $replacement) {
+                                    $description_affichee = preg_replace('/' . preg_quote($keyword, '/') . '/i', $replacement, $description_affichee);
+                                }
+                                
                                 echo nl2br($description_affichee); 
                             ?></div>
 						</div>

@@ -212,7 +212,9 @@ foreach($json['cards'] as $carte) {
 			$effets = [];
 			foreach ($carte['abilities'] as $ability) {
 				if (isset($ability['fullText'])) {
-					$effets[] = $ability['fullText'];
+					// Supprimer les caractères de nouvelle ligne dans la description et les remplacer par des espaces
+					$fulltext = str_replace(["\n", "\r"], " ", $ability['fullText']);
+					$effets[] = $fulltext;
 				}
 			}
 			if (!empty($effets)) {
@@ -222,6 +224,7 @@ foreach($json['cards'] as $carte) {
 		}
 		
 		// Échapper la description pour éviter les erreurs SQL
+		$description_escaped = $mysqli->real_escape_string($description);
 		$description_escaped = $mysqli->real_escape_string($description);
 		
 		// Vérifier si la carte existe déjà
