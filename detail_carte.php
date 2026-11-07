@@ -27,6 +27,7 @@ if (isset($_SESSION["id_user"])) {
 			$rarete		= $t_carte["rarete"];
 			$encre		= $t_carte["encre"];
 			$chapitre	= $t_carte["chapitre"];
+			$description = $t_carte["description"];
 			
 			$sql = "SELECT nom_chapitre FROM chapitres WHERE id_chapitre = '$chapitre'";
 			$res = $mysqli->query($sql);
@@ -93,8 +94,7 @@ if (isset($_SESSION["id_user"])) {
 				$mysqli->query($sql);
 				
 				$nb_f++;
-			}
-	
+			}	
 ?>
 <!doctype html>
 <html lang="fr" data-bs-theme="auto">
@@ -195,18 +195,15 @@ if (isset($_SESSION["id_user"])) {
 						<h3 class="card-title">Informations</h3>
 						
 						<div class="row mb-3">
-							<div class="col-4 fw-bold">Numéro:</div>
-							<div class="col-8"><?php echo htmlspecialchars($num_carte); ?></div>
+							<div class="col-3 fw-bold">Chapitre:</div>
+							<div class="col-3"><?php echo htmlspecialchars($nom_chapitre); ?></div>
+							<div class="col-3 fw-bold">Numéro:</div>
+							<div class="col-3"><?php echo htmlspecialchars($num_carte); ?></div>
 						</div>
 						
 						<div class="row mb-3">
 							<div class="col-4 fw-bold">Catégorie:</div>
 							<div class="col-8"><?php echo htmlspecialchars($cat_carte); ?></div>
-						</div>
-						
-						<div class="row mb-3">
-							<div class="col-4 fw-bold">Chapitre:</div>
-							<div class="col-8"><?php echo htmlspecialchars($nom_chapitre); ?></div>
 						</div>
 						
 						<div class="row mb-3">
@@ -253,6 +250,18 @@ if (isset($_SESSION["id_user"])) {
 									?>
 								</span>
 							</div>
+						</div>
+						
+						<div class="row mb-3">
+							<div class="col-4 fw-bold">Description:</div>
+							<div class="col-8"><?php 
+                                // Rechercher les occurrences de "Mélomane X" et les mettre en gras
+                                $description_affichee = htmlspecialchars($description);
+                                // Utiliser une expression régulière pour trouver "Mélomane" suivi d'un nombre
+                                $pattern = '/Mélomane\s+(\d+)/i';
+                                $description_affichee = preg_replace($pattern, '<strong>Mélomane $1</strong>', $description_affichee);
+                                echo nl2br($description_affichee); 
+                            ?></div>
 						</div>
 						
 						<div class="row mb-3">
