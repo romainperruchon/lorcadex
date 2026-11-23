@@ -25,143 +25,27 @@ if (isset($_SESSION["id_user"]) && isset($_GET['collection'])) {
 		$chapitre_folder = "Chapitre ".$choix_collection;
 	}
 		
-	// Récupération du nombre de cartes par rareté
-	if ($display_all) {
-		$sql_r1 = "SELECT id_carte FROM cartes WHERE rarete='1'";
-		$res_r1 = $mysqli->query($sql_r1);
-		$nb_co = $res_r1->num_rows;
-		
-		$sql_r2 = "SELECT id_carte FROM cartes WHERE rarete='2'";
-		$res_r2 = $mysqli->query($sql_r2);
-		$nb_unco = $res_r2->num_rows;
-		
-		$sql_r3 = "SELECT id_carte FROM cartes WHERE rarete='3'";
-		$res_r3 = $mysqli->query($sql_r3);
-		$nb_r = $res_r3->num_rows;
-		
-		$sql_r4 = "SELECT id_carte FROM cartes WHERE rarete='4'";
-		$res_r4 = $mysqli->query($sql_r4);
-		$nb_tr = $res_r4->num_rows;
-		
-		$sql_r5 = "SELECT id_carte FROM cartes WHERE rarete='5'";
-		$res_r5 = $mysqli->query($sql_r5);
-		$nb_leg = $res_r5->num_rows;
-		
-		$sql_r6 = "SELECT id_carte FROM cartes WHERE rarete='6'";
-		$res_r6 = $mysqli->query($sql_r6);
-		$nb_ench = $res_r6->num_rows;
-		
-		// Nouvelles raretés 7 et 8
-		$sql_r7 = "SELECT id_carte FROM cartes WHERE rarete='7'";
-		$res_r7 = $mysqli->query($sql_r7);
-		$nb_epic = $res_r7->num_rows;
-		
-		$sql_r8 = "SELECT id_carte FROM cartes WHERE rarete='8'";
-		$res_r8 = $mysqli->query($sql_r8);
-		$nb_iconique = $res_r8->num_rows;
-	} else {
-		$sql_r1 = "SELECT id_carte FROM cartes WHERE rarete='1' AND chapitre='$choix_collection'";
-		$res_r1 = $mysqli->query($sql_r1);
-		$nb_co = $res_r1->num_rows;
-		
-		$sql_r2 = "SELECT id_carte FROM cartes WHERE rarete='2' AND chapitre='$choix_collection'";
-		$res_r2 = $mysqli->query($sql_r2);
-		$nb_unco = $res_r2->num_rows;
-		
-		$sql_r3 = "SELECT id_carte FROM cartes WHERE rarete='3' AND chapitre='$choix_collection'";
-		$res_r3 = $mysqli->query($sql_r3);
-		$nb_r = $res_r3->num_rows;
-		
-		$sql_r4 = "SELECT id_carte FROM cartes WHERE rarete='4' AND chapitre='$choix_collection'";
-		$res_r4 = $mysqli->query($sql_r4);
-		$nb_tr = $res_r4->num_rows;
-		
-		$sql_r5 = "SELECT id_carte FROM cartes WHERE rarete='5' AND chapitre='$choix_collection'";
-		$res_r5 = $mysqli->query($sql_r5);
-		$nb_leg = $res_r5->num_rows;
-		
-		$sql_r6 = "SELECT id_carte FROM cartes WHERE rarete='6' AND chapitre='$choix_collection'";
-		$res_r6 = $mysqli->query($sql_r6);
-		$nb_ench = $res_r6->num_rows;
-		
-		// Nouvelles raretés 7 et 8
-		$sql_r7 = "SELECT id_carte FROM cartes WHERE rarete='7' AND chapitre='$choix_collection'";
-		$res_r7 = $mysqli->query($sql_r7);
-		$nb_epic = $res_r7->num_rows;
-		
-		$sql_r8 = "SELECT id_carte FROM cartes WHERE rarete='8' AND chapitre='$choix_collection'";
-		$res_r8 = $mysqli->query($sql_r8);
-		$nb_iconique = $res_r8->num_rows;
+	// Nombre de cartes par rareté : total, puis possédées par l'utilisateur
+	$filtre_chapitre = "";
+	if (!$display_all) {
+		$filtre_chapitre = " AND chapitre='".$mysqli->real_escape_string($choix_collection)."'";
 	}
 	
-	// Récupération du nombre de cartes par rareté de l'utilisateur 
-	if ($display_all) {
-		$sql_r1_user = "SELECT user_as_carte.id_carte FROM user_as_carte, cartes WHERE user_as_carte.id_carte = cartes.id_carte AND user_as_carte.id_user='$id_user' AND rarete='1' GROUP BY user_as_carte.id_carte";
-		$res_r1_user = $mysqli->query($sql_r1_user);
-		$nb_co_user = $res_r1_user->num_rows;
-		
-		$sql_r2_user = "SELECT user_as_carte.id_carte FROM user_as_carte, cartes WHERE user_as_carte.id_carte = cartes.id_carte AND user_as_carte.id_user='$id_user' AND rarete='2' GROUP BY user_as_carte.id_carte";
-		$res_r2_user = $mysqli->query($sql_r2_user);
-		$nb_unco_user = $res_r2_user->num_rows;
-		
-		$sql_r3_user = "SELECT user_as_carte.id_carte FROM user_as_carte, cartes WHERE user_as_carte.id_carte = cartes.id_carte AND user_as_carte.id_user='$id_user' AND rarete='3' GROUP BY user_as_carte.id_carte";
-		$res_r3_user = $mysqli->query($sql_r3_user);
-		$nb_r_user = $res_r3_user->num_rows;
-		
-		$sql_r4_user = "SELECT user_as_carte.id_carte FROM user_as_carte, cartes WHERE user_as_carte.id_carte = cartes.id_carte AND user_as_carte.id_user='$id_user' AND rarete='4' GROUP BY user_as_carte.id_carte";
-		$res_r4_user = $mysqli->query($sql_r4_user);
-		$nb_tr_user = $res_r4_user->num_rows;
-		
-		$sql_r5_user = "SELECT user_as_carte.id_carte FROM user_as_carte, cartes WHERE user_as_carte.id_carte = cartes.id_carte AND user_as_carte.id_user='$id_user' AND rarete='5' GROUP BY user_as_carte.id_carte";
-		$res_r5_user = $mysqli->query($sql_r5_user);
-		$nb_leg_user = $res_r5_user->num_rows;
-		
-		$sql_r6_user = "SELECT user_as_carte.id_carte FROM user_as_carte, cartes WHERE user_as_carte.id_carte = cartes.id_carte AND user_as_carte.id_user='$id_user' AND rarete='6' GROUP BY user_as_carte.id_carte";
-		$res_r6_user = $mysqli->query($sql_r6_user);
-		$nb_ench_user = $res_r6_user->num_rows;
-		
-		// Nouvelles raretés 7 et 8 pour l'utilisateur
-		$sql_r7_user = "SELECT user_as_carte.id_carte FROM user_as_carte, cartes WHERE user_as_carte.id_carte = cartes.id_carte AND user_as_carte.id_user='$id_user' AND rarete='7' GROUP BY user_as_carte.id_carte";
-		$res_r7_user = $mysqli->query($sql_r7_user);
-		$nb_epic_user = $res_r7_user->num_rows;
-		
-		$sql_r8_user = "SELECT user_as_carte.id_carte FROM user_as_carte, cartes WHERE user_as_carte.id_carte = cartes.id_carte AND user_as_carte.id_user='$id_user' AND rarete='8' GROUP BY user_as_carte.id_carte";
-		$res_r8_user = $mysqli->query($sql_r8_user);
-		$nb_iconique_user = $res_r8_user->num_rows;
-	} else {
-		$sql_r1_user = "SELECT user_as_carte.id_carte FROM user_as_carte, cartes WHERE user_as_carte.id_carte = cartes.id_carte AND user_as_carte.id_user='$id_user' AND rarete='1' AND chapitre='$choix_collection' GROUP BY user_as_carte.id_carte";
-		$res_r1_user = $mysqli->query($sql_r1_user);
-		$nb_co_user = $res_r1_user->num_rows;
-		
-		$sql_r2_user = "SELECT user_as_carte.id_carte FROM user_as_carte, cartes WHERE user_as_carte.id_carte = cartes.id_carte AND user_as_carte.id_user='$id_user' AND rarete='2' AND chapitre='$choix_collection' GROUP BY user_as_carte.id_carte";
-		$res_r2_user = $mysqli->query($sql_r2_user);
-		$nb_unco_user = $res_r2_user->num_rows;
-		
-		$sql_r3_user = "SELECT user_as_carte.id_carte FROM user_as_carte, cartes WHERE user_as_carte.id_carte = cartes.id_carte AND user_as_carte.id_user='$id_user' AND rarete='3' AND chapitre='$choix_collection' GROUP BY user_as_carte.id_carte";
-		$res_r3_user = $mysqli->query($sql_r3_user);
-		$nb_r_user = $res_r3_user->num_rows;
-		
-		$sql_r4_user = "SELECT user_as_carte.id_carte FROM user_as_carte, cartes WHERE user_as_carte.id_carte = cartes.id_carte AND user_as_carte.id_user='$id_user' AND rarete='4' AND chapitre='$choix_collection' GROUP BY user_as_carte.id_carte";
-		$res_r4_user = $mysqli->query($sql_r4_user);
-		$nb_tr_user = $res_r4_user->num_rows;
-		
-		$sql_r5_user = "SELECT user_as_carte.id_carte FROM user_as_carte, cartes WHERE user_as_carte.id_carte = cartes.id_carte AND user_as_carte.id_user='$id_user' AND rarete='5' AND chapitre='$choix_collection' GROUP BY user_as_carte.id_carte";
-		$res_r5_user = $mysqli->query($sql_r5_user);
-		$nb_leg_user = $res_r5_user->num_rows;
-		
-		$sql_r6_user = "SELECT user_as_carte.id_carte FROM user_as_carte, cartes WHERE user_as_carte.id_carte = cartes.id_carte AND user_as_carte.id_user='$id_user' AND rarete='6' AND chapitre='$choix_collection' GROUP BY user_as_carte.id_carte";
-		$res_r6_user = $mysqli->query($sql_r6_user);
-		$nb_ench_user = $res_r6_user->num_rows;
-		
-		// Nouvelles raretés 7 et 8 pour l'utilisateur
-		$sql_r7_user = "SELECT user_as_carte.id_carte FROM user_as_carte, cartes WHERE user_as_carte.id_carte = cartes.id_carte AND user_as_carte.id_user='$id_user' AND rarete='7' AND chapitre='$choix_collection' GROUP BY user_as_carte.id_carte";
-		$res_r7_user = $mysqli->query($sql_r7_user);
-		$nb_epic_user = $res_r7_user->num_rows;
-		
-		$sql_r8_user = "SELECT user_as_carte.id_carte FROM user_as_carte, cartes WHERE user_as_carte.id_carte = cartes.id_carte AND user_as_carte.id_user='$id_user' AND rarete='8' AND chapitre='$choix_collection' GROUP BY user_as_carte.id_carte";
-		$res_r8_user = $mysqli->query($sql_r8_user);
-		$nb_iconique_user = $res_r8_user->num_rows;
+	$nb_cartes = array_fill(1, 8, 0);
+	$sql = "SELECT rarete, COUNT(*) AS nb FROM cartes WHERE rarete BETWEEN 1 AND 8".$filtre_chapitre." GROUP BY rarete";
+	$res = $mysqli->query($sql);
+	while ($t = $res->fetch_assoc()) {
+		$nb_cartes[(int)$t['rarete']] = (int)$t['nb'];
 	}
+	list($nb_co, $nb_unco, $nb_r, $nb_tr, $nb_leg, $nb_ench, $nb_epic, $nb_iconique) = array_values($nb_cartes);
+	
+	$nb_cartes_user = array_fill(1, 8, 0);
+	$sql = "SELECT rarete, COUNT(DISTINCT user_as_carte.id_carte) AS nb FROM user_as_carte, cartes WHERE user_as_carte.id_carte = cartes.id_carte AND user_as_carte.id_user='$id_user' AND rarete BETWEEN 1 AND 8".$filtre_chapitre." GROUP BY rarete";
+	$res = $mysqli->query($sql);
+	while ($t = $res->fetch_assoc()) {
+		$nb_cartes_user[(int)$t['rarete']] = (int)$t['nb'];
+	}
+	list($nb_co_user, $nb_unco_user, $nb_r_user, $nb_tr_user, $nb_leg_user, $nb_ench_user, $nb_epic_user, $nb_iconique_user) = array_values($nb_cartes_user);
 ?>
 <!doctype html>
 <html lang="en" data-bs-theme="auto">
@@ -201,6 +85,11 @@ if (isset($_SESSION["id_user"]) && isset($_GET['collection'])) {
 		
 		.img_background-gold {
 			background-color: gold;
+		}
+		
+		/* Réserve la place de la carte pour que le chargement différé (lazy) des images fonctionne */
+		.image_carte img {
+			aspect-ratio: auto 63 / 88;
 		}
 	
       .bd-placeholder-img {
@@ -480,27 +369,44 @@ if (isset($_SESSION["id_user"]) && isset($_GET['collection'])) {
 			$choix_affichage = $_POST['choix_affichage'];
 		}
 		
-		if ($display_all) {
-			$sql = "SELECT * FROM cartes ORDER BY chapitre, numero_carte + 0, numero_carte";
-		} else {
-			$sql = "SELECT * FROM cartes WHERE chapitre='$choix_collection'";
+		// Récupération de la liste des cartes
+		$conditions = array();
+		if (!$display_all) {
+			$conditions[] = "chapitre='".$mysqli->real_escape_string($choix_collection)."'";
 		}
 		
 		if ($choix_affichage == 2) {
-			$sql .= " AND id_carte NOT IN (SELECT DISTINCT(id_carte) FROM user_as_carte WHERE id_user='$id_user' AND quantite > 0)";
+			$conditions[] = "id_carte NOT IN (SELECT DISTINCT(id_carte) FROM user_as_carte WHERE id_user='$id_user' AND quantite > 0)";
 		}
 		else if ($choix_affichage == 3) {
-			$sql .= " AND id_carte NOT IN (SELECT DISTINCT(id_carte) FROM user_as_carte WHERE id_user='$id_user' AND (quantite > 0 OR (quantite = 0 AND foil='0')))";
+			$conditions[] = "id_carte NOT IN (SELECT DISTINCT(id_carte) FROM user_as_carte WHERE id_user='$id_user' AND (quantite > 0 OR (quantite = 0 AND foil='0')))";
 		}
 		else if ($choix_affichage == 4) {
-			$sql .= " AND id_carte NOT IN (SELECT DISTINCT(id_carte) FROM user_as_carte WHERE id_user='$id_user' AND quantite > 0 AND foil='1' AND rarete != 6 AND rarete != 7 AND rarete != 8)";
+			// Les raretés 6, 7 et 8 n'ont pas de version foil : elles sont toujours affichées
+			$conditions[] = "(rarete IN (6, 7, 8) OR id_carte NOT IN (SELECT DISTINCT(id_carte) FROM user_as_carte WHERE id_user='$id_user' AND quantite > 0 AND foil='1'))";
 		}
 		else if ($choix_affichage == 5) {
-			$sql .= " AND id_carte IN (SELECT DISTINCT(id_carte) FROM user_as_carte WHERE id_user='$id_user' AND quantite > 0 )";
+			$conditions[] = "id_carte IN (SELECT DISTINCT(id_carte) FROM user_as_carte WHERE id_user='$id_user' AND quantite > 0 )";
 		}
 		
-		// Récupération de la liste des cartes du chapitre 1
+		$sql = "SELECT id_carte, numero_carte, nom_carte, categorie_carte, rarete, encre, artiste, image, chapitre FROM cartes";
+		if (count($conditions) > 0) {
+			$sql .= " WHERE ".implode(" AND ", $conditions);
+		}
+		if ($display_all) {
+			$sql .= " ORDER BY chapitre, numero_carte + 0, numero_carte";
+		}
+		
 		$res = $mysqli->query($sql);
+		
+		// Quantités possédées par l'utilisateur : une seule requête pour toutes les cartes
+		$quantites = array();
+		$res_quantites = $mysqli->query("SELECT id_carte, foil, quantite FROM user_as_carte WHERE id_user='$id_user'");
+		while ($t = $res_quantites->fetch_assoc()) {
+			if (!isset($quantites[$t['id_carte']][$t['foil']])) {
+				$quantites[$t['id_carte']][$t['foil']] = $t['quantite'];
+			}
+		}
 		
 		while ($t_cartes = $res->fetch_assoc()) {
 			
@@ -514,25 +420,9 @@ if (isset($_SESSION["id_user"]) && isset($_GET['collection'])) {
 			$image_url	= $t_cartes["image"];
 			$chapitre_num = $t_cartes["chapitre"];
 			
-			// Nombre non foil
-			$sql_nb_nf = "SELECT quantite FROM user_as_carte WHERE id_user='$id_user' AND id_carte='$id_carte' AND foil='0'";
-			$res_nb_nf = $mysqli->query($sql_nb_nf);
-			if($t = $res_nb_nf->fetch_assoc()) {
-				$nb_nf = $t['quantite'];
-			}
-			else {
-				$nb_nf = 0;
-			}
-			
-			// Nombre foil
-			$sql_nb_f = "SELECT quantite FROM user_as_carte WHERE id_user='$id_user' AND id_carte='$id_carte' AND foil='1'";
-			$res_nb_f = $mysqli->query($sql_nb_f);
-			if($t = $res_nb_f->fetch_assoc()) {
-				$nb_f = $t['quantite'];
-			}
-			else {
-				$nb_f = 0;
-			}
+			// Nombre non foil et foil
+			$nb_nf = $quantites[$id_carte][0] ?? 0;
+			$nb_f = $quantites[$id_carte][1] ?? 0;
 			
 		?>
 	  
@@ -583,7 +473,7 @@ if (isset($_SESSION["id_user"]) && isset($_GET['collection'])) {
 				<?php 
 				// Construct local image path
 				if ($display_all) {
-					$local_image_path = 'cartes/FR/'.$num_carte.'.jpg';
+					$local_image_path = 'cartes/FR/Chapitre '.$chapitre_num.'/'.$num_carte.'.jpg';
 				} else {
 					$local_image_path = 'cartes/FR/'.$chapitre_folder.'/'.$num_carte.'.jpg';
 				}
@@ -595,7 +485,7 @@ if (isset($_SESSION["id_user"]) && isset($_GET['collection'])) {
 					$image_src = $image_url;
 				}
 				echo "<a href='".$image_src."' class='image_carte' data-toggle=\"lightbox\" data-gallery=\"chapitre1\" />";
-				echo "\t<img src='".$image_src."' width='100%' height='100%' id='img_card_".$id_carte."' class='img-fluid img-thumbnail";
+				echo "\t<img src='".$image_src."' width='100%' height='100%' loading='lazy' decoding='async' id='img_card_".$id_carte."' class='img-fluid img-thumbnail";
 
 				if ($nb_nf > 0 || $nb_f > 0) {
 					if ($nb_nf > 0 && $nb_f > 0) {
@@ -871,7 +761,7 @@ if (isset($_SESSION["id_user"]) && isset($_GET['collection'])) {
 	}
 
 	// Gestion des clics sur les boutons d'ajout/suppression
-	$('.btn-group').on('click', 'input[type="submit"]', function(e) {
+	$(document).on('click', '.btn-group input[type="submit"]', function(e) {
 		// Vérifier si Shift est enfoncé
 		if (e.shiftKey) {
 			var elementId = $(this).attr('id');
@@ -903,7 +793,7 @@ if (isset($_SESSION["id_user"]) && isset($_GET['collection'])) {
 	});
 	
 	// Gestion du clic droit (contextmenu) pour suppression
-	$('.btn-group').on('contextmenu', 'input[type="submit"]', function(e) {
+	$(document).on('contextmenu', '.btn-group input[type="submit"]', function(e) {
 		e.preventDefault();
 		var elementId = $(this).attr('id');
 		var id_card;
