@@ -3,6 +3,7 @@ type carte :
 2 - Action
 3 - Objet
 4 - Chanson
+5 - Lieu
 
 Encre :
 1 - Ambre 

@@ -46,6 +46,37 @@ if (isset($_SESSION["id_user"]) && isset($_GET['collection'])) {
 		$nb_cartes_user[(int)$t['rarete']] = (int)$t['nb'];
 	}
 	list($nb_co_user, $nb_unco_user, $nb_r_user, $nb_tr_user, $nb_leg_user, $nb_ench_user, $nb_epic_user, $nb_iconique_user) = array_values($nb_cartes_user);
+	
+	// Critères du panneau de filtres avancés
+	// Critères numériques : code => array(libellé, colonne de la table cartes)
+	$filtres_numeriques = array(
+		"attaque" => array("Attaque", "force_carte"),
+		"volonte" => array("Volonté", "volonte_carte"),
+		"cout"    => array("Coût", "cout_carte"),
+		"lore"    => array("Nombre de lore", "lore_carte")
+	);
+	$filtres_types = array(1 => "Personnage", 2 => "Action", 4 => "Chanson", 3 => "Objet", 5 => "Lieu");
+	
+	// Capacités : code => array(libellé, colonne booléenne de la table cartes ou null si elle n'existe pas)
+	$filtres_capacites = array(
+		"charge"        => array("Charge", "charge"),
+		"offensif"      => array("Offensif", null),
+		"melomane"      => array("Mélomane", null),
+		"rempart"       => array("Rempart", "rempart"),
+		"alter"         => array("Alter", null),
+		"soutien"       => array("Soutien", "soutien"),
+		"insaisissable" => array("Insaisissable", "inssaisissable"),
+		"hors-atteinte" => array("Hors d'atteinte", "hors_atteinte"),
+		"agilite"       => array("Agilité", null)
+	);
+	
+	// Une carte possède une capacité quand son mot-clé ouvre un paragraphe de la description ("Rempart (...)").
+	// Ailleurs dans le texte, il s'agit d'un effet qui accorde la capacité à d'autres personnages.
+	$regex_capacites = array();
+	foreach ($filtres_capacites as $code => $capacite) {
+		$mot_cle = str_replace("'", "['’]", preg_quote($capacite[0], "/"));
+		$regex_capacites[$code] = '/^[ \t]*'.$mot_cle.'(?!\p{L})/mu';
+	}
 ?>
 <!doctype html>
 <html lang="en" data-bs-theme="auto">
@@ -268,6 +299,23 @@ if (isset($_SESSION["id_user"]) && isset($_GET['collection'])) {
 		box-shadow: 0 0 0 2px rgba(0,123,255,.25);
 	  }
 	  
+	  /* Cartes masquées par le panneau de filtres */
+	  .hors-filtres {
+		display: none !important;
+	  }
+	  
+	  /* Panneau de filtres : s'ouvre par-dessus les cartes et défile si l'écran est trop petit */
+	  .panneau-filtres {
+		color: var(--bs-body-color);
+		margin-top: 4px;
+		padding-top: 8px;
+		padding-bottom: 8px;
+		border-top: 1px solid #dee2e6;
+		max-height: calc(100vh - 240px);
+		max-height: calc(100dvh - 240px);
+		overflow-y: auto;
+	  }
+	  
 	  /* Add padding-top for mobile view (row-cols-2) */
 	  @media (max-width: 575.98px) {
 		.row.row-cols-2 {
@@ -316,6 +364,10 @@ if (isset($_SESSION["id_user"]) && isset($_GET['collection'])) {
 		
 		<img title='aciers' onclick="effacer_aciers()" id="encre6" src='img/encre6.png' class="img-fluid" />
 		<img title='aciers' onclick="afficher_aciers()" id="encre6_disable" src='img/e6 - disabled.png' class="img-fluid" style='display:none;' />
+		
+		<button type="button" id="btn_filtres" class="btn btn-sm btn-outline-secondary align-middle py-0 px-1" title="Filtrer les cartes" aria-controls="panneau_filtres" aria-expanded="false" onclick="basculer_filtres()">
+		  <span class="material-icons align-middle">filter_list</span><span class="d-none d-sm-inline align-middle">Filtres</span><span id="nb_filtres_actifs" class="badge text-bg-primary ms-1 align-middle" hidden></span>
+		</button>
 	  </div>
       <div class="col-7">
 		
@@ -355,6 +407,52 @@ if (isset($_SESSION["id_user"]) && isset($_GET['collection'])) {
 		<span class="material-icons" style='cursor:pointer;float:right;display:none' id='icon_afficher_image' onclick="afficher_image()">image</span>
       </div>
     </div>
+	
+	<!-- Panneau dépliable de filtres avancés -->
+	<div id="panneau_filtres" class="panneau-filtres container text-start" role="region" aria-label="Filtres des cartes" data-bs-theme="light" hidden>
+	  <div class="row g-2">
+		<?php foreach ($filtres_numeriques as $cle => $filtre) { ?>
+		<div class="col-6 col-md-3">
+		  <label class="form-label small fw-bold mb-1" for="filtre_<?php echo $cle; ?>_min"><?php echo $filtre[0]; ?></label>
+		  <div class="input-group input-group-sm">
+			<input type="number" min="0" inputmode="numeric" id="filtre_<?php echo $cle; ?>_min" class="form-control" placeholder="Min" aria-label="<?php echo $filtre[0]; ?> minimum" autocomplete="off">
+			<input type="number" min="0" inputmode="numeric" id="filtre_<?php echo $cle; ?>_max" class="form-control" placeholder="Max" aria-label="<?php echo $filtre[0]; ?> maximum" autocomplete="off">
+		  </div>
+		</div>
+		<?php } ?>
+	  </div>
+	  
+	  <div class="mt-2">
+		<div class="small fw-bold mb-1">Type</div>
+		<?php foreach ($filtres_types as $code => $libelle) { ?>
+		<input type="checkbox" class="btn-check" name="filtre_type" id="filtre_type_<?php echo $code; ?>" value="<?php echo $code; ?>" autocomplete="off">
+		<label class="btn btn-sm btn-outline-primary mb-1" for="filtre_type_<?php echo $code; ?>"><?php echo $libelle; ?></label>
+		<?php } ?>
+	  </div>
+	  
+	  <div class="mt-2">
+		<div class="small fw-bold mb-1">Capacité</div>
+		<?php foreach ($filtres_capacites as $code => $capacite) { ?>
+		<input type="checkbox" class="btn-check" name="filtre_capacite" id="filtre_capacite_<?php echo $code; ?>" value="<?php echo $code; ?>" autocomplete="off">
+		<label class="btn btn-sm btn-outline-primary mb-1" for="filtre_capacite_<?php echo $code; ?>"><?php echo htmlspecialchars($capacite[0]); ?></label>
+		<?php } ?>
+		<div class="small">
+		  <div class="form-check form-check-inline">
+			<input class="form-check-input" type="radio" name="filtre_mode_capacite" id="filtre_mode_une" value="une" checked autocomplete="off">
+			<label class="form-check-label" for="filtre_mode_une">Au moins une</label>
+		  </div>
+		  <div class="form-check form-check-inline">
+			<input class="form-check-input" type="radio" name="filtre_mode_capacite" id="filtre_mode_toutes" value="toutes" autocomplete="off">
+			<label class="form-check-label" for="filtre_mode_toutes">Toutes</label>
+		  </div>
+		</div>
+	  </div>
+	  
+	  <div class="d-flex justify-content-between align-items-center mt-2">
+		<span id="resultat_filtres" class="small text-body-secondary" aria-live="polite"></span>
+		<button type="button" class="btn btn-sm btn-outline-secondary" onclick="reinitialiser_filtres()">Réinitialiser</button>
+	  </div>
+	</div>
   </section>
 
   <div class="album py-2 bg-body-tertiary">
@@ -389,7 +487,7 @@ if (isset($_SESSION["id_user"]) && isset($_GET['collection'])) {
 			$conditions[] = "id_carte IN (SELECT DISTINCT(id_carte) FROM user_as_carte WHERE id_user='$id_user' AND quantite > 0 )";
 		}
 		
-		$sql = "SELECT id_carte, numero_carte, nom_carte, categorie_carte, rarete, encre, artiste, image, chapitre FROM cartes";
+		$sql = "SELECT id_carte, numero_carte, nom_carte, categorie_carte, rarete, encre, artiste, image, chapitre, cout_carte, force_carte, volonte_carte, lore_carte, type_carte, charge, rempart, soutien, inssaisissable, hors_atteinte, description FROM cartes";
 		if (count($conditions) > 0) {
 			$sql .= " WHERE ".implode(" AND ", $conditions);
 		}
@@ -420,6 +518,23 @@ if (isset($_SESSION["id_user"]) && isset($_GET['collection'])) {
 			$image_url	= $t_cartes["image"];
 			$chapitre_num = $t_cartes["chapitre"];
 			
+			// Données lues par le panneau de filtres (valeur vide quand la carte n'a pas la caractéristique)
+			$attributs_filtres = "";
+			foreach ($filtres_numeriques as $cle => $filtre) {
+				$valeur = $t_cartes[$filtre[1]];
+				$attributs_filtres .= ' data-'.$cle.'="'.($valeur === null ? '' : (int)$valeur).'"';
+			}
+			$attributs_filtres .= ' data-type="'.(int)$t_cartes["type_carte"].'"';
+			
+			$capacites_carte = array();
+			foreach ($filtres_capacites as $code => $capacite) {
+				$par_colonne = $capacite[1] !== null && !empty($t_cartes[$capacite[1]]);
+				if ($par_colonne || preg_match($regex_capacites[$code], (string)$t_cartes["description"])) {
+					$capacites_carte[] = $code;
+				}
+			}
+			$attributs_filtres .= ' data-capacites="'.implode(' ', $capacites_carte).'"';
+			
 			// Nombre non foil et foil
 			$nb_nf = $quantites[$id_carte][0] ?? 0;
 			$nb_f = $quantites[$id_carte][1] ?? 0;
@@ -444,7 +559,7 @@ if (isset($_SESSION["id_user"]) && isset($_GET['collection'])) {
 			elseif ($encre == 4) { echo "rubis"; } 
 			elseif ($encre == 5) { echo "saphir"; } 
 			elseif ($encre == 6) { echo "acier"; }
-		?>" id="card_<?php echo $id_carte; ?>" data-name="<?php echo strtolower($nom_carte); ?>" data-category="<?php echo strtolower($cat_carte); ?>" data-artist="<?php echo strtolower($artiste); ?>">
+		?>" id="card_<?php echo $id_carte; ?>" data-name="<?php echo strtolower($nom_carte); ?>" data-category="<?php echo strtolower($cat_carte); ?>" data-artist="<?php echo strtolower($artiste); ?>"<?php echo $attributs_filtres; ?>>
 		<?php
         echo "<div id='img_background_".$id_carte."' class='card shadow-sm";
 		if ($nb_nf + $nb_f >= 4) {
@@ -1164,6 +1279,83 @@ if (isset($_SESSION["id_user"]) && isset($_GET['collection'])) {
 			}
 		});
 	}
+</script>
+
+<script type="text/javascript">
+	// Panneau de filtres avancés : attaque, volonté, coût, lore, type et capacités
+	const FILTRES_NUMERIQUES = <?php echo json_encode(array_keys($filtres_numeriques)); ?>;
+	
+	function basculer_filtres() {
+		const panneau = document.getElementById('panneau_filtres');
+		panneau.hidden = !panneau.hidden;
+		document.getElementById('btn_filtres').setAttribute('aria-expanded', String(!panneau.hidden));
+	}
+	
+	function appliquer_filtres() {
+		const panneau = document.getElementById('panneau_filtres');
+		const cochees = (nom) => Array.from(panneau.querySelectorAll('input[name="' + nom + '"]:checked'), (champ) => champ.value);
+		const saisie = (champ) => champ.value === '' ? null : Number(champ.value);
+		
+		// Un critère numérique est actif dès qu'un minimum ou un maximum est saisi
+		const numeriques = [];
+		FILTRES_NUMERIQUES.forEach((cle) => {
+			const champ_min = document.getElementById('filtre_' + cle + '_min');
+			const champ_max = document.getElementById('filtre_' + cle + '_max');
+			const min = saisie(champ_min);
+			const max = saisie(champ_max);
+			const incoherent = min !== null && max !== null && min > max;
+			champ_min.classList.toggle('border-danger', incoherent);
+			champ_max.classList.toggle('border-danger', incoherent);
+			if (min !== null || max !== null) {
+				numeriques.push({cle: cle, min: min, max: max});
+			}
+		});
+		const types = cochees('filtre_type');
+		const capacites = cochees('filtre_capacite');
+		const toutes_capacites = document.getElementById('filtre_mode_toutes').checked;
+		
+		const cartes = document.querySelectorAll('.col[id^="card_"]');
+		let nb_affichees = 0;
+		cartes.forEach((carte) => {
+			// Les cartes sans la caractéristique (ex. attaque d'une Action) ne passent pas un critère numérique
+			let visible = numeriques.every((filtre) => {
+				const texte = carte.dataset[filtre.cle];
+				if (texte === undefined || texte === '') {
+					return false;
+				}
+				const valeur = Number(texte);
+				return (filtre.min === null || valeur >= filtre.min) && (filtre.max === null || valeur <= filtre.max);
+			});
+			if (visible && types.length > 0) {
+				visible = types.includes(carte.dataset.type);
+			}
+			if (visible && capacites.length > 0) {
+				const possedees = (carte.dataset.capacites || '').split(' ');
+				visible = toutes_capacites ? capacites.every((c) => possedees.includes(c)) : capacites.some((c) => possedees.includes(c));
+			}
+			carte.classList.toggle('hors-filtres', !visible);
+			if (visible) {
+				nb_affichees++;
+			}
+		});
+		
+		const nb_actifs = numeriques.length + (types.length > 0 ? 1 : 0) + (capacites.length > 0 ? 1 : 0);
+		const badge = document.getElementById('nb_filtres_actifs');
+		badge.textContent = nb_actifs;
+		badge.hidden = nb_actifs === 0;
+		document.getElementById('resultat_filtres').textContent = nb_affichees + ' / ' + cartes.length + ' cartes';
+	}
+	
+	function reinitialiser_filtres() {
+		const panneau = document.getElementById('panneau_filtres');
+		panneau.querySelectorAll('input[type="number"]').forEach((champ) => { champ.value = ''; });
+		panneau.querySelectorAll('input[type="checkbox"]').forEach((champ) => { champ.checked = false; });
+		document.getElementById('filtre_mode_une').checked = true;
+		appliquer_filtres();
+	}
+	
+	document.getElementById('panneau_filtres').addEventListener('input', appliquer_filtres);
+	appliquer_filtres();
 </script>
 
   </body>
