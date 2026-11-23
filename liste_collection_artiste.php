@@ -74,14 +74,25 @@ if (isset($_SESSION["id_user"])) {
 	  $res_artists = $stmt->get_result();
 	  
 	  if ($res_artists->num_rows > 0) {
-		echo "<div class='row mb-4'>";
+		echo "<div class='row g-3 mb-4'>";
 		echo "<div class='col-12 col-md-6 col-lg-4'>";
 		echo "<label for='rechercheArtiste' class='visually-hidden'>Rechercher un artiste</label>";
 		echo "<input type='search' id='rechercheArtiste' class='form-control' placeholder='Rechercher un artiste...' autocomplete='off'>";
 		echo "</div>";
+		echo "<div class='col-12 col-md-6 col-lg-4'>";
+		echo "<div class='input-group'>";
+		echo "<label for='triArtistes' class='input-group-text'>Trier par</label>";
+		echo "<select id='triArtistes' class='form-select'>";
+		echo "<option value='nom-asc'>Nom (A → Z)</option>";
+		echo "<option value='nom-desc'>Nom (Z → A)</option>";
+		echo "<option value='total-asc'>Total (croissant)</option>";
+		echo "<option value='total-desc'>Total (décroissant)</option>";
+		echo "</select>";
+		echo "</div>";
+		echo "</div>";
 		echo "</div>";
 		
-		echo "<div class='row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4'>";
+		echo "<div id='listeArtistes' class='row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4'>";
 		
 		while ($artist = $res_artists->fetch_assoc()) {
 			$artist_name = $artist['artiste'];
@@ -147,7 +158,7 @@ if (isset($_SESSION["id_user"])) {
 				$card_title = $card_data['nom_carte'];
 			}
 			
-			echo "<div class='col' data-artiste='" . htmlspecialchars($artist_name, ENT_QUOTES) . "'>";
+			echo "<div class='col' data-artiste='" . htmlspecialchars($artist_name, ENT_QUOTES) . "' data-total='" . (int) $total_artist_cards . "'>";
 			echo "<a href='collection_artiste.php?artiste=" . urlencode($artist_name) . "' class='text-decoration-none'>";
 			echo "<div class='card artist-card h-100 border-info'>";
 			echo "<img src='" . htmlspecialchars($card_image) . "' class='artist-card-img' alt='" . htmlspecialchars($card_title) . "'>";
@@ -192,6 +203,27 @@ if (isset($_SESSION["id_user"])) {
 
         champRecherche.addEventListener('input', filtrerArtistes);
         filtrerArtistes();
+      }
+
+      const selectTri = document.getElementById('triArtistes');
+
+      if (selectTri) {
+        const grille = document.getElementById('listeArtistes');
+        const colonnes = Array.from(grille.querySelectorAll('[data-artiste]'));
+        // Le SQL renvoie déjà les artistes triés par nom : cet ordre sert de référence pour "Nom" et pour départager les égalités
+        const rang = new Map(colonnes.map((colonne, index) => [colonne, index]));
+
+        const trierArtistes = () => {
+          const [critere, sens] = selectTri.value.split('-');
+          const direction = sens === 'desc' ? -1 : 1;
+          const valeur = (colonne) => (critere === 'total' ? Number(colonne.dataset.total) : rang.get(colonne));
+
+          const tries = [...colonnes].sort((a, b) => direction * (valeur(a) - valeur(b)) || rang.get(a) - rang.get(b));
+          grille.append(...tries);
+        };
+
+        selectTri.addEventListener('change', trierArtistes);
+        trierArtistes();
       }
     </script>
   </body>
