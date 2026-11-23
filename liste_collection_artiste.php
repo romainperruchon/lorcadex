@@ -74,6 +74,13 @@ if (isset($_SESSION["id_user"])) {
 	  $res_artists = $stmt->get_result();
 	  
 	  if ($res_artists->num_rows > 0) {
+		echo "<div class='row mb-4'>";
+		echo "<div class='col-12 col-md-6 col-lg-4'>";
+		echo "<label for='rechercheArtiste' class='visually-hidden'>Rechercher un artiste</label>";
+		echo "<input type='search' id='rechercheArtiste' class='form-control' placeholder='Rechercher un artiste...' autocomplete='off'>";
+		echo "</div>";
+		echo "</div>";
+		
 		echo "<div class='row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4'>";
 		
 		while ($artist = $res_artists->fetch_assoc()) {
@@ -140,7 +147,7 @@ if (isset($_SESSION["id_user"])) {
 				$card_title = $card_data['nom_carte'];
 			}
 			
-			echo "<div class='col'>";
+			echo "<div class='col' data-artiste='" . htmlspecialchars($artist_name, ENT_QUOTES) . "'>";
 			echo "<a href='collection_artiste.php?artiste=" . urlencode($artist_name) . "' class='text-decoration-none'>";
 			echo "<div class='card artist-card h-100 border-info'>";
 			echo "<img src='" . htmlspecialchars($card_image) . "' class='artist-card-img' alt='" . htmlspecialchars($card_title) . "'>";
@@ -155,11 +162,38 @@ if (isset($_SESSION["id_user"])) {
 		}
 		
 		echo "</div>";
+		echo "<p id='aucunResultat' class='d-none mt-3'>Aucun artiste ne correspond à votre recherche.</p>";
 	  } else {
 		echo "<p>Aucun artiste trouvé dans votre collection.</p>";
 	  }
 	  ?>
 	</main>
+    <script>
+      const champRecherche = document.getElementById('rechercheArtiste');
+
+      if (champRecherche) {
+        // Insensible à la casse et aux accents : "cesar" trouve "César"
+        const normaliser = (texte) => texte.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
+
+        const filtrerArtistes = () => {
+          const recherche = normaliser(champRecherche.value.trim());
+          let nbVisibles = 0;
+
+          document.querySelectorAll('[data-artiste]').forEach((colonne) => {
+            const visible = normaliser(colonne.dataset.artiste).includes(recherche);
+            colonne.classList.toggle('d-none', !visible);
+            if (visible) {
+              nbVisibles++;
+            }
+          });
+
+          document.getElementById('aucunResultat').classList.toggle('d-none', nbVisibles > 0);
+        };
+
+        champRecherche.addEventListener('input', filtrerArtistes);
+        filtrerArtistes();
+      }
+    </script>
   </body>
 </html>
 <?php 
