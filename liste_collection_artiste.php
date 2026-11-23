@@ -8,6 +8,34 @@ if (isset($_SESSION["id_user"])) {
 	
 	$id_user = $_SESSION["id_user"];
 	
+	// Une seule requête pour tous les artistes (au lieu de 4 par artiste) : cartes possédées dont foil,
+	// carte affichée (la plus ancienne possédée) et total de cartes de l'artiste dans toute la base
+	$sql = "SELECT a.artiste, d.image, d.nom_carte, a.total_cards, a.foil_cards, t.total_artist_cards
+	        FROM (
+	            SELECT c.artiste AS artiste,
+	                   MIN(c.id_carte) AS id_carte,
+	                   COUNT(*) AS total_cards,
+	                   COUNT(CASE WHEN uac.foil = 1 THEN 1 END) AS foil_cards
+	            FROM cartes AS c
+	            JOIN user_as_carte AS uac ON c.id_carte = uac.id_carte
+	            WHERE uac.id_user = ? AND c.artiste IS NOT NULL AND c.artiste != ''
+	            GROUP BY c.artiste
+	        ) AS a
+	        JOIN cartes AS d ON d.id_carte = a.id_carte
+	        JOIN (
+	            SELECT artiste, COUNT(*) AS total_artist_cards
+	            FROM cartes
+	            WHERE artiste IS NOT NULL AND artiste != ''
+	            GROUP BY artiste
+	        ) AS t ON t.artiste = a.artiste
+	        ORDER BY a.artiste";
+	
+	$stmt = $mysqli->prepare($sql);
+	$stmt->bind_param("i", $id_user);
+	$stmt->execute();
+	$res_artists = $stmt->get_result();
+	$artist_count = $res_artists->num_rows;
+	
 ?>
 <!doctype html>
 <html lang="fr" data-bs-theme="auto">
@@ -41,19 +69,6 @@ if (isset($_SESSION["id_user"])) {
 	  <div class="d-flex justify-content-between align-items-center mb-4">
 		<h1>Collection par artiste 
 		<?php
-		// Get the count of distinct artists
-		$count_sql = "SELECT COUNT(DISTINCT(c.artiste)) as artist_count
-		              FROM cartes AS c 
-		              JOIN user_as_carte AS uac ON c.id_carte = uac.id_carte
-		              WHERE uac.id_user = ? AND c.artiste IS NOT NULL AND c.artiste != ''";
-		
-		$count_stmt = $mysqli->prepare($count_sql);
-		$count_stmt->bind_param("i", $id_user);
-		$count_stmt->execute();
-		$count_result = $count_stmt->get_result();
-		$count_data = $count_result->fetch_assoc();
-		$artist_count = $count_data['artist_count'];
-		
 		echo "(" . $artist_count . " artiste" . ($artist_count > 1 ? "s" : "") . ")";
 		?>
 		</h1>
@@ -61,19 +76,7 @@ if (isset($_SESSION["id_user"])) {
 	  </div>
 	  
 	  <?php
-	  // Get all artists from user's collection
-	  $sql = "SELECT DISTINCT(c.artiste) 
-	          FROM cartes AS c 
-	          JOIN user_as_carte AS uac ON c.id_carte = uac.id_carte
-	          WHERE uac.id_user = ? AND c.artiste IS NOT NULL AND c.artiste != ''
-	          ORDER BY c.artiste";
-	  
-	  $stmt = $mysqli->prepare($sql);
-	  $stmt->bind_param("i", $id_user);
-	  $stmt->execute();
-	  $res_artists = $stmt->get_result();
-	  
-	  if ($res_artists->num_rows > 0) {
+	  if ($artist_count > 0) {
 		echo "<div class='row g-3 mb-4'>";
 		echo "<div class='col-12 col-md-6 col-lg-4'>";
 		echo "<label for='rechercheArtiste' class='visually-hidden'>Rechercher un artiste</label>";
@@ -96,72 +99,16 @@ if (isset($_SESSION["id_user"])) {
 		
 		while ($artist = $res_artists->fetch_assoc()) {
 			$artist_name = $artist['artiste'];
-			
-			// Count total cards for this artist (in the entire database)
-			$sql_total_artist = "SELECT COUNT(*) as total_artist_cards 
-						  FROM cartes AS c 
-						  WHERE c.artiste = ?";
-			
-			$stmt_total = $mysqli->prepare($sql_total_artist);
-			$stmt_total->bind_param("s", $artist_name);
-			$stmt_total->execute();
-			$res_total_artist = $stmt_total->get_result();
-			$total_artist_data = $res_total_artist->fetch_assoc();
-			$total_artist_cards = $total_artist_data['total_artist_cards'];
-			
-			// Count total cards for this artist in user's collection
-			$sql_count = "SELECT COUNT(*) as total_cards 
-						  FROM cartes AS c 
-						  JOIN user_as_carte AS uac ON c.id_carte = uac.id_carte
-						  WHERE uac.id_user = ? AND c.artiste = ?";
-			
-			$stmt_count = $mysqli->prepare($sql_count);
-			$stmt_count->bind_param("is", $id_user, $artist_name);
-			$stmt_count->execute();
-			$res_count = $stmt_count->get_result();
-			$count_data = $res_count->fetch_assoc();
-			$total_cards = $count_data['total_cards'];
-			
-			// Count foil cards for this artist in user's collection
-			$sql_foil = "SELECT COUNT(*) as foil_cards 
-						 FROM cartes AS c 
-						 JOIN user_as_carte AS uac ON c.id_carte = uac.id_carte
-						 WHERE uac.id_user = ? AND c.artiste = ? AND uac.foil = 1";
-			
-			$stmt_foil = $mysqli->prepare($sql_foil);
-			$stmt_foil->bind_param("is", $id_user, $artist_name);
-			$stmt_foil->execute();
-			$res_foil = $stmt_foil->get_result();
-			$foil_data = $res_foil->fetch_assoc();
-			$foil_cards = $foil_data['foil_cards'];
-			
-			// Get one card from this artist for display (from user's collection)
-			$sql_card = "SELECT c.image, c.nom_carte, c.id_carte
-						 FROM cartes AS c 
-						 JOIN user_as_carte AS uac ON c.id_carte = uac.id_carte
-						 WHERE uac.id_user = ? AND c.artiste = ?
-						 ORDER BY c.id_carte ASC
-						 LIMIT 1";
-			
-			$stmt_card = $mysqli->prepare($sql_card);
-			$stmt_card->bind_param("is", $id_user, $artist_name);
-			$stmt_card->execute();
-			$res_card = $stmt_card->get_result();
-			
-			// Default image if no card found in user's collection
-			$card_image = "./assets/images/default-card.png";
-			$card_title = "Carte de l'artiste";
-			
-			if ($res_card && $res_card->num_rows > 0) {
-				$card_data = $res_card->fetch_assoc();
-				$card_image = $card_data['image'];
-				$card_title = $card_data['nom_carte'];
-			}
+			$total_artist_cards = $artist['total_artist_cards'];
+			$total_cards = $artist['total_cards'];
+			$foil_cards = $artist['foil_cards'];
+			$card_image = (string) $artist['image']; // image NULL en base : évite le "Deprecated" de htmlspecialchars() en PHP 8.1+
+			$card_title = $artist['nom_carte'];
 			
 			echo "<div class='col' data-artiste='" . htmlspecialchars($artist_name, ENT_QUOTES) . "' data-total='" . (int) $total_artist_cards . "'>";
 			echo "<a href='collection_artiste.php?artiste=" . urlencode($artist_name) . "' class='text-decoration-none'>";
 			echo "<div class='card artist-card h-100 border-info'>";
-			echo "<img src='" . htmlspecialchars($card_image) . "' class='artist-card-img' alt='" . htmlspecialchars($card_title) . "'>";
+			echo "<img src='" . htmlspecialchars($card_image) . "' class='artist-card-img' loading='lazy' alt='" . htmlspecialchars($card_title) . "'>";
 			echo "<div class='card-body text-center'>";
 			echo "<h5 class='card-title'>" . htmlspecialchars($artist_name) . "</h5>";
 			echo "<p class='card-text'>Possédées : " . $total_cards . " cartes (Dont " . $foil_cards . " foil)</p>";
