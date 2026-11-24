@@ -10,12 +10,16 @@ if (isset($_SESSION["id_user"])) {
 	
 	// Une seule requête pour tous les artistes (au lieu de 4 par artiste) : cartes possédées dont foil,
 	// carte affichée (la plus ancienne possédée) et total de cartes de l'artiste dans toute la base
-	$sql = "SELECT a.artiste, d.image, d.nom_carte, a.total_cards, a.foil_cards, t.total_artist_cards
+	// Raretés 1 à 5 (commune à légendaire) : 2 versions (foil + non foil) ; autres raretés : 1 seule version
+	$sql = "SELECT a.artiste, d.image, d.nom_carte, a.total_cards, a.foil_cards, a.owned_versions, t.total_artist_cards, t.total_versions
 	        FROM (
 	            SELECT c.artiste AS artiste,
 	                   MIN(c.id_carte) AS id_carte,
 	                   COUNT(*) AS total_cards,
-	                   COUNT(CASE WHEN uac.foil = 1 THEN 1 END) AS foil_cards
+	                   COUNT(CASE WHEN uac.foil = 1 THEN 1 END) AS foil_cards,
+	                   COUNT(DISTINCT CASE WHEN uac.quantite > 0
+	                       THEN (CASE WHEN c.rarete BETWEEN 1 AND 5 THEN CONCAT(c.id_carte, '-', uac.foil) ELSE CAST(c.id_carte AS CHAR) END)
+	                   END) AS owned_versions
 	            FROM cartes AS c
 	            JOIN user_as_carte AS uac ON c.id_carte = uac.id_carte
 	            WHERE uac.id_user = ? AND c.artiste IS NOT NULL AND c.artiste != ''
@@ -23,7 +27,8 @@ if (isset($_SESSION["id_user"])) {
 	        ) AS a
 	        JOIN cartes AS d ON d.id_carte = a.id_carte
 	        JOIN (
-	            SELECT artiste, COUNT(*) AS total_artist_cards
+	            SELECT artiste, COUNT(*) AS total_artist_cards,
+	                   SUM(CASE WHEN rarete BETWEEN 1 AND 5 THEN 2 ELSE 1 END) AS total_versions
 	            FROM cartes
 	            WHERE artiste IS NOT NULL AND artiste != ''
 	            GROUP BY artiste
@@ -102,6 +107,7 @@ if (isset($_SESSION["id_user"])) {
 			$total_artist_cards = $artist['total_artist_cards'];
 			$total_cards = $artist['total_cards'];
 			$foil_cards = $artist['foil_cards'];
+			$pourcentage = $artist['total_versions'] > 0 ? min(100, round($artist['owned_versions'] / $artist['total_versions'] * 100, 1)) : 0;
 			$card_image = (string) $artist['image']; // image NULL en base : évite le "Deprecated" de htmlspecialchars() en PHP 8.1+
 			$card_title = $artist['nom_carte'];
 			
@@ -113,7 +119,10 @@ if (isset($_SESSION["id_user"])) {
 			echo "<h5 class='card-title'>" . htmlspecialchars($artist_name) . "</h5>";
 			echo "<p class='card-text'>Possédées : " . $total_cards . " cartes (Dont " . $foil_cards . " foil)</p>";
 			echo "<p class='card-text'>Total : " . $total_artist_cards . " cartes</p>";
-			echo "</div>";
+						echo "<div class='progress' role='progressbar' aria-valuenow='" . $pourcentage . "' aria-valuemin='0' aria-valuemax='100'>";
+						echo "<div class='progress-bar' style='width: " . $pourcentage . "%'>" . $pourcentage . " %</div>";
+						echo "</div>";
+						echo "</div>";
 			echo "</div>";
 			echo "</a>";
 			echo "</div>";
