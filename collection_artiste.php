@@ -21,12 +21,17 @@ if (isset($_SESSION["id_user"]) && isset($_GET['artiste'])) {
 	
 	<style>
       .card-img-top {
-        height: 200px;
         object-fit: cover;
+        width: 100%;
+		height: 100%;
+        display: block;
       }
       
       .card {
         transition: transform 0.2s;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
       }
       
       .card:hover {
@@ -42,6 +47,7 @@ if (isset($_SESSION["id_user"]) && isset($_GET['artiste'])) {
         padding: 1px 8px;
         border-radius: 12px;
         font-size: 0.8rem;
+        z-index: 10;
       }
 
 	  .collection-badge-foil {
@@ -53,6 +59,38 @@ if (isset($_SESSION["id_user"]) && isset($_GET['artiste'])) {
         padding: 1px 8px;
         border-radius: 12px;
         font-size: 0.8rem;
+        z-index: 10;
+      }
+      
+      .card-body {
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        height: 100%;
+        padding: 0.75rem;
+      }
+      
+      .card-title {
+        min-height: 40px;
+        margin-bottom: 0.5rem !important;
+      }
+      
+      .card-text {
+        flex-grow: 1;
+        margin-bottom: 0.5rem;
+      }
+      
+      .btn-details {
+        margin-top: auto;
+      }
+      
+      /* Ajout d'une marge supplémentaire pour éviter les problèmes d'affichage */
+      .row {
+        margin: 0 -0.75rem;
+      }
+      
+      .col {
+        padding: 0 0.75rem;
       }
     </style>
   </head>
@@ -123,7 +161,10 @@ if (isset($_SESSION["id_user"]) && isset($_GET['artiste'])) {
 			echo "<div class='col'>";
 			echo "<div class='card h-100'>";
 			echo "<div class='position-relative'>";
+			// Lien sur l'image pour aller aux détails
+			echo "<a href='detail_carte.php?id_carte=" . $id_carte . "'>";
 			echo "<img src='" . htmlspecialchars($img_src) . "' class='card-img-top' alt='" . htmlspecialchars($nom_carte) . "'>";
+			echo "</a>";
 			if ($quantite > 0) {
 				echo "<span class='collection-badge'>" . $quantite . "</span>";
 			}
@@ -131,10 +172,10 @@ if (isset($_SESSION["id_user"]) && isset($_GET['artiste'])) {
 				echo "<span class='collection-badge-foil'>" . $foil . "</span>";
 			}
 			echo "</div>";
-			echo "<div class='card-body'>";
-			echo "<h6 class='card-title text-center'>" . htmlspecialchars($nom_carte) . "</h6>";
-			echo "<div class='d-grid gap-2'>";
-			echo "<a href='detail_carte.php?id_carte=" . $id_carte . "' class='btn btn-sm btn-outline-primary'>Détails</a>";
+			echo "<div class='card-body d-flex flex-column'>";
+			echo "<h6 class='card-title text-center mb-2'>" . htmlspecialchars($nom_carte) . "</h6>";
+			echo "<div class='mt-auto'>";
+			echo "<a href='detail_carte.php?id_carte=" . $id_carte . "' class='btn btn-sm btn-outline-primary w-100 btn-details'>Détails</a>";
 			echo "</div>";
 			echo "</div>";
 			echo "</div>";

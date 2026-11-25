@@ -145,8 +145,8 @@ if (isset($_SESSION["id_user"])) {
 <header data-bs-theme="dark">
   <div class="navbar-dark bg-dark shadow-sm">
     <div class="container">
-      <a href="collection.php<?php echo "?collection=$chapitre"; ?>" class="navbar-brand d-flex align-items-center">
-        <img src="./img/logo.png" alt="" width="52" height="72"><strong><?php echo htmlspecialchars($nom_chapitre); ?></strong>
+      <a href="dashboard.php" class="navbar-brand d-flex align-items-center">
+        <img src="./img/logo.png" alt="" width="52" height="72"><strong>Dashboard</strong>
       </a>
     </div>
   </div>
@@ -196,7 +196,7 @@ if (isset($_SESSION["id_user"])) {
 						
 						<div class="row mb-3">
 							<div class="col-3 fw-bold">Chapitre:</div>
-							<div class="col-3"><?php echo htmlspecialchars($nom_chapitre); ?></div>
+							<div class="col-3"><a href="collection.php?collection=<?php echo $chapitre; ?>" class="text-decoration-none"><?php echo htmlspecialchars($nom_chapitre); ?></a></div>
 							<div class="col-3 fw-bold">Numéro:</div>
 							<div class="col-3"><?php echo htmlspecialchars($num_carte); ?></div>
 						</div>
