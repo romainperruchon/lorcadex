@@ -122,7 +122,7 @@ if (isset($_SESSION["id_user"])) {
 	<main class="container py-5">
 	  <div class="text-center mb-5">
 		<h1>Bienvenue sur Lorcadex</h1>
-		<p class="lead">Votre collection de cartes Lorca</p>
+		<p class="lead">Votre collection de cartes Lorcana</p>
 	  </div>
 	  
 	  <div class="row row-cols-1 row-cols-md-3 g-4">
