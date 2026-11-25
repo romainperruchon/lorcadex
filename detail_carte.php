@@ -295,7 +295,7 @@ if (isset($_SESSION["id_user"])) {
 						
 						<div class="row mb-3">
 							<div class="col-4 fw-bold">Artiste:</div>
-							<div class="col-8"><?php echo htmlspecialchars($t_carte["artiste"]); ?></div>
+							<div class="col-8"><a href="collection_artiste.php?artiste=<?php echo urlencode($t_carte["artiste"]); ?>" class="text-decoration-none"><?php echo htmlspecialchars($t_carte["artiste"]); ?></a></div>
 						</div>
 					</div>
 				</div>
