@@ -95,6 +95,8 @@ if (isset($_SESSION["id_user"])) {
 		echo "<option value='nom-desc'>Nom (Z → A)</option>";
 		echo "<option value='total-asc'>Total (croissant)</option>";
 		echo "<option value='total-desc'>Total (décroissant)</option>";
+		echo "<option value='pourcentage-asc'>Pourcentage (croissant)</option>";
+		echo "<option value='pourcentage-desc'>Pourcentage (décroissant)</option>";
 		echo "</select>";
 		echo "</div>";
 		echo "</div>";
@@ -111,7 +113,7 @@ if (isset($_SESSION["id_user"])) {
 			$card_image = (string) $artist['image']; // image NULL en base : évite le "Deprecated" de htmlspecialchars() en PHP 8.1+
 			$card_title = $artist['nom_carte'];
 			
-			echo "<div class='col' data-artiste='" . htmlspecialchars($artist_name, ENT_QUOTES) . "' data-total='" . (int) $total_artist_cards . "'>";
+			echo "<div class='col' data-artiste='" . htmlspecialchars($artist_name, ENT_QUOTES) . "' data-total='" . (int) $total_artist_cards . "' data-pourcentage='" . $pourcentage . "'>";
 			echo "<a href='collection_artiste.php?artiste=" . urlencode($artist_name) . "' class='text-decoration-none'>";
 			echo "<div class='card artist-card h-100 border-info'>";
 			echo "<img src='" . htmlspecialchars($card_image) . "' class='artist-card-img' loading='lazy' alt='" . htmlspecialchars($card_title) . "'>";
@@ -172,7 +174,11 @@ if (isset($_SESSION["id_user"])) {
         const trierArtistes = () => {
           const [critere, sens] = selectTri.value.split('-');
           const direction = sens === 'desc' ? -1 : 1;
-          const valeur = (colonne) => (critere === 'total' ? Number(colonne.dataset.total) : rang.get(colonne));
+          const valeur = (colonne) => {
+            if (critere === 'total') return Number(colonne.dataset.total);
+            if (critere === 'pourcentage') return Number(colonne.dataset.pourcentage);
+            return rang.get(colonne);
+          };
 
           const tries = [...colonnes].sort((a, b) => direction * (valeur(a) - valeur(b)) || rang.get(a) - rang.get(b));
           grille.append(...tries);
