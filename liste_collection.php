@@ -66,14 +66,93 @@ if (isset($_SESSION["id_user"])) {
 	a.nounderline:link 
 	{ 
 	 text-decoration:none; 
-	} 
+	}
+	
+	.btn-back-dashboard {
+		display: inline-flex;
+		align-items: center;
+		gap: 8px;
+		padding: 10px 20px;
+		background: linear-gradient(135deg, #007bff 0%, #0056b3 100%);
+		color: white;
+		text-decoration: none;
+		border-radius: 8px;
+		font-weight: 500;
+		font-size: 15px;
+		border: none;
+		cursor: pointer;
+		transition: all 0.3s ease;
+		box-shadow: 0 2px 8px rgba(0, 86, 179, 0.3);
+	}
+	
+	.btn-back-dashboard:hover {
+		background: linear-gradient(135deg, #0056b3 0%, #004085 100%);
+		color: white;
+		text-decoration: none;
+		box-shadow: 0 4px 16px rgba(0, 86, 179, 0.5);
+		transform: translateY(-2px);
+	}
+	
+	.btn-back-dashboard:active {
+		transform: translateY(0);
+		box-shadow: 0 2px 8px rgba(0, 86, 179, 0.3);
+	}
+	
+	.theme-switcher-wrapper {
+		display: flex;
+		align-items: center;
+		gap: 12px;
+		margin-left: auto;
+	}
+	
+	.theme-switcher {
+		display: inline-flex;
+		gap: 6px;
+		padding: 6px;
+		background: rgba(0, 0, 0, 0.1);
+		border-radius: 8px;
+	}
+	
+	[data-bs-theme-value] {
+		padding: 6px 12px;
+		border: 2px solid transparent;
+		background: none;
+		cursor: pointer;
+		border-radius: 6px;
+		font-size: 14px;
+		font-weight: 500;
+		transition: all 0.2s ease;
+		color: var(--bs-body-color);
+	}
+	
+	[data-bs-theme-value]:hover {
+		background: rgba(0, 0, 0, 0.1);
+	}
+	
+	[data-bs-theme-value].active {
+		background: var(--bs-primary);
+		color: white;
+		border-color: var(--bs-primary);
+	}
 	</style>
   </head>
   <body>
   
   <main>
-	<div class="container-fluid mb-3">
-		<a href="dashboard.php" class="btn btn-primary">← Retour au tableau de bord</a>
+	<div class="container-fluid mb-3" style="display: flex; align-items: center;">
+		<a href="dashboard.php" class="btn-back-dashboard">
+			<span>🏠</span>
+			<span>Retour au tableau de bord</span>
+		</a>
+		
+		<div class="theme-switcher-wrapper">
+			<small style="margin-right: 6px;">Thème:</small>
+			<div class="theme-switcher" role="group" aria-label="Choix du thème">
+				<button type="button" class="btn-sm" data-bs-theme-value="light" aria-pressed="false" title="Thème clair">☀️ Clair</button>
+				<button type="button" class="btn-sm" data-bs-theme-value="dark" aria-pressed="false" title="Thème sombre">🌙 Sombre</button>
+				<button type="button" class="btn-sm" data-bs-theme-value="auto" aria-pressed="true" title="Thème automatique">🔄 Auto</button>
+			</div>
+		</div>
 	</div>
 	
 	<div class="container">
