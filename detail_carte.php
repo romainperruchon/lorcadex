@@ -156,7 +156,15 @@ if (isset($_SESSION["id_user"])) {
 	<div class="container card-detail-container">
 		<div class="row justify-content-center mb-4">
 			<div class="col-md-10 text-center">
-				<h1 class="display-6 fw-bold text-primary"><?php echo htmlspecialchars($nom_carte_princ); ?></h1>
+				<div style="display: flex; align-items: center; justify-content: center; gap: 12px;">
+					<h1 class="display-6 fw-bold text-primary" style="margin: 0;"><?php echo htmlspecialchars($nom_carte_princ); ?></h1>
+					<a href="collection.php?collection=all&search=<?php echo urlencode($nom_carte_princ); ?>" 
+					   class="btn btn-sm btn-outline-info" 
+					   title="Voir toutes les cartes avec ce nom"
+					   style="padding: 6px 10px; font-size: 14px; white-space: nowrap;">
+						🔍 Voir toutes
+					</a>
+				</div>
 				<?php if (!empty($nom_carte_sec)): ?>
 					<h2 class="display-7 fw-bold text-secondary"><?php echo htmlspecialchars($nom_carte_sec); ?></h2>
 				<?php endif; ?>
@@ -203,7 +211,22 @@ if (isset($_SESSION["id_user"])) {
 						
 						<div class="row mb-3">
 							<div class="col-4 fw-bold">Catégorie:</div>
-							<div class="col-8"><?php echo htmlspecialchars($cat_carte); ?></div>
+							<div class="col-8">
+								<?php
+								// Diviser les catégories et créer des liens pour chaque
+								$categories = array_filter(array_map('trim', preg_split('/\s+/', $cat_carte)));
+								
+								if (!empty($categories)) {
+									$category_links = array_map(function($cat) use ($chapitre) {
+										$cat_encoded = urlencode($cat);
+										return '<a href="collection.php?collection=all" class="badge bg-info" style="text-decoration: none; cursor: pointer;" onclick="filterByCategory(\'' . addslashes($cat) . '\'); return false;">' . htmlspecialchars($cat) . '</a>';
+									}, $categories);
+									echo implode(' ', $category_links);
+								} else {
+									echo htmlspecialchars($cat_carte);
+								}
+								?>
+							</div>
 						</div>
 						
 						<div class="row mb-3">
@@ -358,6 +381,23 @@ if (isset($_SESSION["id_user"])) {
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/ekko-lightbox/5.3.0/ekko-lightbox.min.js"></script>
+
+<script>
+function filterByCategory(category) {
+	// Récupérer le chapitre actuel depuis l'URL ou la page
+	const chapitre = new URLSearchParams(window.location.search).get('id_carte') ? 
+		'<?php echo $chapitre; ?>' : 
+		'<?php echo $chapitre; ?>';
+	
+	// Rediriger vers collection.php avec le chapitre courant
+	// Le filtrage par catégorie se fera côté collection.php via le filtre de recherche
+	const categoryFilter = category.toLowerCase();
+	const baseUrl = 'collection.php?collection=' + chapitre;
+	
+	// Rediriger et déclencher le filtre via un paramètre de recherche
+	window.location.href = baseUrl + '&search=' + encodeURIComponent(category);
+}
+</script>
 
   </body>
 </html>
