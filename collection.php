@@ -391,17 +391,21 @@ if (isset($_SESSION["id_user"]) && isset($_GET['collection'])) {
 		<img title='legendaires' onclick="afficher_legendaires()" id="rarete5_disable" src='img/r5_disabled.png' class="img-fluid" style='display:none;' />
 		<?php echo $nb_leg_user."/".$nb_leg; ?>
 		
+		<?php if ($nb_epic > 0) { ?>
 		<img title='epiques' onclick="effacer_epiques()" id="rarete7" src='img/rarete_7.png' class="img-fluid" />
 		<img title='epiques' onclick="afficher_epiques()" id="rarete7_disable" src='img/r7_disabled.png' class="img-fluid" style='display:none;' />
-		<?php echo $nb_epic_user."/".$nb_epic; ?>
+		<?php echo $nb_epic_user."/".$nb_epic; 
+		} ?>
 
 		<img title='enchantees' onclick="effacer_enchantees()" id="rarete6" src='img/rarete_6.png' class="img-fluid" />
 		<img title='enchantees' onclick="afficher_enchantees()" id="rarete6_disable" src='img/r6_disabled.png' class="img-fluid" style='display:none;' />
 		<?php echo $nb_ench_user."/".$nb_ench; ?>
 		
+		<?php if ($nb_iconique > 0) { ?>
 		<img title='iconiques' onclick="effacer_iconiques()" id="rarete8" src='img/rarete_8.png' class="img-fluid" />
 		<img title='iconiques' onclick="afficher_iconiques()" id="rarete8_disable" src='img/r8_disabled.png' class="img-fluid" style='display:none;' />
-		<?php echo $nb_iconique_user."/".$nb_iconique; ?>
+		<?php echo $nb_iconique_user."/".$nb_iconique; 
+		} ?>
 		
 		<span class="material-icons" style='cursor:pointer;float:right' id='icon_afficher_min' onclick="afficher_min()">view_module</span>
 		<span class="material-icons" style='cursor:pointer;float:right;display:none' id='icon_afficher_image' onclick="afficher_image()">image</span>

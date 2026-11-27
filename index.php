@@ -87,7 +87,7 @@ function is_user_logged_in($mysqli) {
 }
 
 if (is_user_logged_in($mysqli)) {
-	header("location:liste_collection.php");
+	header("location:dashboard.php");
 }
 else {
 	header("location:login.php");
