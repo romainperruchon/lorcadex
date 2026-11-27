@@ -30,6 +30,36 @@
 	box-shadow: 0 2px 8px rgba(0, 86, 179, 0.3);
 }
 
+.btn-logout {
+	display: inline-flex;
+	align-items: center;
+	gap: 6px;
+	padding: 8px 14px;
+	background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
+	color: white;
+	text-decoration: none;
+	border-radius: 6px;
+	font-weight: 500;
+	font-size: 14px;
+	border: none;
+	cursor: pointer;
+	transition: all 0.3s ease;
+	box-shadow: 0 2px 6px rgba(220, 53, 69, 0.3);
+}
+
+.btn-logout:hover {
+	background: linear-gradient(135deg, #c82333 0%, #bd2130 100%);
+	color: white;
+	text-decoration: none;
+	box-shadow: 0 4px 12px rgba(220, 53, 69, 0.5);
+	transform: translateY(-2px);
+}
+
+.btn-logout:active {
+	transform: translateY(0);
+	box-shadow: 0 2px 6px rgba(220, 53, 69, 0.3);
+}
+
 .theme-switcher-wrapper {
 	display: flex;
 	align-items: center;

@@ -134,24 +134,61 @@ if (isset($_SESSION["id_user"])) {
 		color: white;
 		border-color: var(--bs-primary);
 	}
+	
+	.btn-logout {
+		display: inline-flex;
+		align-items: center;
+		gap: 6px;
+		padding: 8px 14px;
+		background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
+		color: white;
+		text-decoration: none;
+		border-radius: 6px;
+		font-weight: 500;
+		font-size: 14px;
+		border: none;
+		cursor: pointer;
+		transition: all 0.3s ease;
+		box-shadow: 0 2px 6px rgba(220, 53, 69, 0.3);
+	}
+	
+	.btn-logout:hover {
+		background: linear-gradient(135deg, #c82333 0%, #bd2130 100%);
+		color: white;
+		text-decoration: none;
+		box-shadow: 0 4px 12px rgba(220, 53, 69, 0.5);
+		transform: translateY(-2px);
+	}
+	
+	.btn-logout:active {
+		transform: translateY(0);
+		box-shadow: 0 2px 6px rgba(220, 53, 69, 0.3);
+	}
 	</style>
   </head>
   <body>
   
   <main>
-	<div class="container-fluid mb-3" style="display: flex; align-items: center;">
+	<div class="container-fluid mb-3" style="display: flex; align-items: center; justify-content: space-between;">
 		<a href="dashboard.php" class="btn-back-dashboard">
 			<span>🏠</span>
 			<span>Retour au tableau de bord</span>
 		</a>
 		
-		<div class="theme-switcher-wrapper">
-			<small style="margin-right: 6px;">Thème:</small>
-			<div class="theme-switcher" role="group" aria-label="Choix du thème">
-				<button type="button" class="btn-sm" data-bs-theme-value="light" aria-pressed="false" title="Thème clair">☀️ Clair</button>
-				<button type="button" class="btn-sm" data-bs-theme-value="dark" aria-pressed="false" title="Thème sombre">🌙 Sombre</button>
-				<button type="button" class="btn-sm" data-bs-theme-value="auto" aria-pressed="true" title="Thème automatique">🔄 Auto</button>
+		<div style="display: flex; gap: 12px; align-items: center;">
+			<div class="theme-switcher-wrapper" style="margin-left: 0;">
+				<small style="margin-right: 6px;">Thème:</small>
+				<div class="theme-switcher" role="group" aria-label="Choix du thème">
+					<button type="button" class="btn-sm" data-bs-theme-value="light" aria-pressed="false" title="Thème clair">☀️ Clair</button>
+					<button type="button" class="btn-sm" data-bs-theme-value="dark" aria-pressed="false" title="Thème sombre">🌙 Sombre</button>
+					<button type="button" class="btn-sm" data-bs-theme-value="auto" aria-pressed="true" title="Thème automatique">🔄 Auto</button>
+				</div>
 			</div>
+			
+			<a href="logout.php" class="btn-logout" onclick="return confirm('Êtes-vous sûr de vouloir vous déconnecter ?');">
+				<span>🚪</span>
+				<span>Déconnexion</span>
+			</a>
 		</div>
 	</div>
 	
